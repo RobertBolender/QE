@@ -5,7 +5,8 @@
   "author": "Robert Bolender",
   "license": "MIT",
   "scripts": {
-    "start": "npx servor --browse --reload"
+    "start:server": "node index.js",
+    "start:app": "npx servor public/ --browse --reload"
   },
   "dependencies": {
     "express": "^4.17.1"
