@@ -6,5 +6,8 @@
   "license": "MIT",
   "scripts": {
     "start": "npx servor --browse --reload"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
   }
 }
