@@ -1,11 +1,65 @@
+// Server setup
 const express = require("express");
 const app = express();
 const port = 3000;
 
+app.use(express.urlencoded({ extended: false }));
 app.use(express.static("public"));
 
-app.get("/", (req, res) => res.send("Hello World!"));
+// Game state
+const { getGameId } = require("./util/crypto");
+const games = new Map();
 
+/**
+ * GET /game/:id
+ *
+ * Get the current game state.
+ */
+app.get("/game/:id", (req, res) => {
+  const gameId = req.params.id;
+  if (!games.has(gameId)) {
+    return res.status(400).send("Game not found.");
+  }
+
+  return res.json(games.get(gameId));
+});
+
+/**
+ * GET /games
+ *
+ * Get a list of games with links to each game.
+ */
+app.get("/games", (req, res) => {
+  const activeGameCount = games.size;
+  if (!activeGameCount) {
+    return res.send("No active games.");
+  }
+
+  const activeGames = Array.from(
+    games,
+    ([key, value]) => `<li><a href="${value.url}">${value.name}</a></li>`
+  ).join("");
+
+  return res.send(`<p>Active games:</p><ul>${activeGames}</ul>`);
+});
+
+/**
+ * POST /games
+ *
+ * Start a new game.
+ */
+app.post("/games", (req, res) => {
+  if (!req.body.name) {
+    return res.status(400).send("You need a name to create a game.");
+  }
+
+  // TODO: Sanitize name input
+  const newId = getGameId();
+  games.set(newId, { name: req.body.name, url: `/game/${newId}` });
+  return res.redirect(`/game/${newId}`);
+});
+
+// Here we go
 app.listen(port, () =>
-  console.log(`Example app listening at http://localhost:${port}`)
+  console.log(`QE game server listening at http://localhost:${port}`)
 );

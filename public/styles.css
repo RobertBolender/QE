@@ -1,0 +1,37 @@
+p {
+  margin: 0;
+}
+
+form {
+  display: inline-grid;
+  grid-auto-flow: row;
+  grid-gap: 12px;
+  padding: 16px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  max-width: 275px;
+}
+
+label {
+  font-weight: bold;
+}
+
+input {
+  display: block;
+  min-width: 200px;
+}
+
+button {
+  background: #fff;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+button:hover {
+  background: #efefef;
+}
+
+button:active {
+  background: #ddd;
+}
