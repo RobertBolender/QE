@@ -115,11 +115,7 @@ function ExistingGames({ games, setGameState }) {
         disabled=${games.length === 0}
         required
       >
-        ${games.length === 0 &&
-        html`<option value="">No existing games</option>`}
-        ${games.length === 1 && html`<option value="">1 existing game</option>`}
-        ${games.length > 1 &&
-        html`<option value="">${games.length} existing games</option>`}
+        <option selected disabled>Choose an existing game</option>
         ${games.map(
           (game) =>
             html`<option value=${game.id}
