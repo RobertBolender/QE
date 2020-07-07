@@ -6,11 +6,14 @@ const port = 3000;
 app.use(express.json());
 app.use(express.static("public"));
 
-// Game state
+// Utilities
+const { createGameId } = require("./util/crypto");
 const { sessionHandler, getUserId } = require("./util/session-handler");
 app.use(sessionHandler);
-const { createGameId } = require("./util/crypto");
-const games = new Map();
+
+// Game state
+const activeGames = new Map();
+const pendingGames = new Map();
 
 /**
  * GET /game/:id
@@ -19,11 +22,15 @@ const games = new Map();
  */
 app.get("/game/:id", (req, res) => {
   const gameId = req.params.id;
-  if (!games.has(gameId)) {
-    return res.status(400).send("Game not found.");
+  if (activeGames.has(gameId)) {
+    return res.json(activeGames.get(gameId));
   }
 
-  return res.json(games.get(gameId));
+  if (pendingGames.has(gameId)) {
+    return res.json(pendingGames.get(gameId));
+  }
+
+  return res.status(400).send("Game not found.");
 });
 
 /**
@@ -33,7 +40,7 @@ app.get("/game/:id", (req, res) => {
  */
 app.post("/game/:id/join", (req, res) => {
   const gameId = req.params.id;
-  if (!games.has(gameId)) {
+  if (!pendingGames.has(gameId)) {
     return res.status(404).send("Game not found.");
   }
 
@@ -45,13 +52,13 @@ app.post("/game/:id/join", (req, res) => {
     return res.status(400).send("You need a bid to join a game.");
   }
 
-  const game = games.get(gameId);
+  const game = pendingGames.get(gameId);
   game.players = [
     ...game.players,
     { id: getUserId(req), bid: req.body.bid, player: req.body.player },
   ];
 
-  return res.json(games.get(gameId));
+  return res.json(pendingGames.get(gameId));
 });
 
 /**
@@ -61,20 +68,20 @@ app.post("/game/:id/join", (req, res) => {
  */
 app.get("/games", (req, res) => {
   if (!req.accepts("html")) {
-    return res.json(Array.from(games.values()));
+    return res.json(Array.from(pendingGames.values()));
   }
 
-  const activeGameCount = games.size;
-  if (!activeGameCount) {
-    return res.send("No active games.");
+  const pendingGameCount = pendingGames.size;
+  if (!pendingGameCount) {
+    return res.send("No pending games.");
   }
 
-  const activeGames = Array.from(
-    games,
+  const pendingGamesToJoin = Array.from(
+    pendingGames,
     ([key, value]) => `<li><a href="${value.url}">${value.name}</a></li>`
   ).join("");
 
-  return res.send(`<p>Active games:</p><ul>${activeGames}</ul>`);
+  return res.send(`<p>Pending Games:</p><ul>${pendingGamesToJoin}</ul>`);
 });
 
 /**
@@ -104,7 +111,7 @@ app.post("/games", (req, res) => {
       { id: getUserId(req), bid: req.body.bid, player: req.body.player },
     ],
   };
-  games.set(newId, newGame);
+  pendingGames.set(newId, newGame);
   return res.json(newGame);
 });
 
