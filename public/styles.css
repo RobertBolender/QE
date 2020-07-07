@@ -62,6 +62,11 @@ button:active {
   text-align: center;
 }
 
+.radio-set > input:disabled + label {
+  pointer-events: none;
+  font-weight: normal;
+}
+
 .radio-set > input + label:after {
   content: "";
   position: absolute;

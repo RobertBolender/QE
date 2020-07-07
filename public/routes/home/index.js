@@ -37,10 +37,13 @@ function JoinOrCreateGame({ setGameState }) {
         id="join"
         type="radio"
         name="mode"
+        disabled=${existingGames.length === 0}
         checked=${!isCreating}
         onChange=${() => setIsCreating(false)}
       />
-      <label for="join">Join Game</label>
+      <label for="join"
+        >${existingGames.length === 0 ? "No games to join" : "Join Game"}</label
+      >
       <input
         id="create"
         type="radio"
