@@ -8,13 +8,13 @@ import htm from "https://unpkg.com/htm?module";
 const html = htm.bind(React.createElement);
 
 export default function App() {
-  const [gameId, setGameId] = useState();
+  const [gameState, setGameState] = useState({});
 
-  if (!gameId) {
-    return html`<${NewGame} setGameId=${setGameId} />`;
+  if (!gameState.id) {
+    return html`<${NewGame} setGameState=${setGameState} />`;
   }
 
-  return html`<${Game} gameId=${gameId} />`;
+  return html`<${Game} gameState=${gameState} />`;
 }
 
 function useExistingGames() {
@@ -29,7 +29,7 @@ function useExistingGames() {
   return existingGames;
 }
 
-function ExistingGames({ games, setGameId }) {
+function ExistingGames({ games, setGameState }) {
   const [id, setId] = useState();
   const [player, setPlayer] = useState();
   const [bid, setBid] = useState();
@@ -51,7 +51,7 @@ function ExistingGames({ games, setGameId }) {
         player,
         bid,
       });
-      setGameId(data.id);
+      setGameState(data);
     },
     [id, player, bid]
   );
@@ -109,7 +109,7 @@ function ExistingGames({ games, setGameId }) {
   </div>`;
 }
 
-function NewGame({ setGameId }) {
+function NewGame({ setGameState }) {
   const loadedGames = useExistingGames();
 
   const [name, setName] = useState();
@@ -125,14 +125,14 @@ function NewGame({ setGameId }) {
       event.preventDefault();
 
       const data = await fetchJson("/games", "POST", { name, player, bid });
-      setGameId(data.id);
+      setGameState(data);
     },
     [name, player, bid]
   );
 
   return html`<div>
     <h1>QE: Create a Game</h1>
-    <${ExistingGames} games=${loadedGames} setGameId=${setGameId} />
+    <${ExistingGames} games=${loadedGames} setGameState=${setGameState} />
     <form method="POST" action="/games" onSubmit=${handleSubmit}>
       <label for="name">Game name</label>
       <input
@@ -169,10 +169,10 @@ function NewGame({ setGameId }) {
   </div>`;
 }
 
-function Game({ gameId }) {
+function Game({ gameState }) {
   return html`<div>
     <h1>QE: Game</h1>
-    <p>${gameId}</p>
+    <p>${gameState.id}</p>
   </div>`;
 }
 
