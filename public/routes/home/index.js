@@ -11,10 +11,52 @@ export default function App() {
   const [gameState, setGameState] = useState({});
 
   if (!gameState.id) {
-    return html`<${NewGame} setGameState=${setGameState} />`;
+    return html`<${JoinOrCreateGame} setGameState=${setGameState} />`;
   }
 
   return html`<${Game} gameState=${gameState} />`;
+}
+
+function JoinOrCreateGame({ setGameState }) {
+  const [isCreating, setIsCreating] = useState(false);
+
+  const existingGames = useExistingGames();
+  useEffect(() => {
+    if (existingGames && existingGames.length === 0) {
+      setIsCreating(true);
+    }
+  }, [existingGames]);
+
+  if (!existingGames) {
+    return "Loading...";
+  }
+
+  return html`<div>
+    <div className="radio-set">
+      <input
+        id="join"
+        type="radio"
+        name="mode"
+        checked=${!isCreating}
+        onChange=${() => setIsCreating(false)}
+      />
+      <label for="join">Join Game</label>
+      <input
+        id="create"
+        type="radio"
+        name="mode"
+        checked=${isCreating}
+        onChange=${() => setIsCreating(true)}
+      />
+      <label for="create">Create Game</label>
+    </div>
+    ${isCreating
+      ? html`<${NewGame} setGameState="${setGameState}" />`
+      : html`<${ExistingGames}
+          setGameState=${setGameState}
+          games=${existingGames}
+        />`}
+  </div>`;
 }
 
 function useExistingGames() {
@@ -61,7 +103,7 @@ function ExistingGames({ games, setGameState }) {
   }
 
   return html`<div>
-    <h2>Join a Game</h2>
+    <h1>QE: Join a Game</h1>
     <form onSubmit=${handleSubmit}>
       <label for="game">Pick a Game</label>
       <select
@@ -110,8 +152,6 @@ function ExistingGames({ games, setGameState }) {
 }
 
 function NewGame({ setGameState }) {
-  const loadedGames = useExistingGames();
-
   const [name, setName] = useState();
   const [player, setPlayer] = useState();
   const [bid, setBid] = useState();
@@ -132,7 +172,6 @@ function NewGame({ setGameState }) {
 
   return html`<div>
     <h1>QE: Create a Game</h1>
-    <${ExistingGames} games=${loadedGames} setGameState=${setGameState} />
     <form method="POST" action="/games" onSubmit=${handleSubmit}>
       <label for="name">Game name</label>
       <input

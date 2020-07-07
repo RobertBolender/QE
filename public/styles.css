@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 p {
   margin: 0;
 }
@@ -21,6 +25,11 @@ input {
   min-width: 200px;
 }
 
+input,
+select {
+  min-height: 22px;
+}
+
 button {
   background: #fff;
   border: 1px solid #333;
@@ -28,10 +37,44 @@ button {
   padding: 8px 12px;
 }
 
+label:hover,
 button:hover {
   background: #efefef;
 }
 
+label:active,
 button:active {
   background: #ddd;
+}
+
+.radio-set {
+  display: flex;
+}
+
+.radio-set > input {
+  display: none;
+}
+
+.radio-set > input + label {
+  position: relative;
+  flex: 1 0 0;
+  padding: 12px;
+  text-align: center;
+}
+
+.radio-set > input + label:after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #333;
+  transition: all 250ms;
+}
+
+.radio-set > input:checked + label:after {
+  top: calc(100% - 2px);
+  background: green;
+  height: 8px;
 }
