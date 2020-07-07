@@ -3,11 +3,13 @@ const express = require("express");
 const app = express();
 const port = 3000;
 
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 app.use(express.static("public"));
 
 // Game state
-const { getGameId } = require("./util/crypto");
+const { sessionHandler, getUserId } = require("./util/session-handler");
+app.use(sessionHandler);
+const { createGameId } = require("./util/crypto");
 const games = new Map();
 
 /**
@@ -53,10 +55,15 @@ app.post("/games", (req, res) => {
     return res.status(400).send("You need a name to create a game.");
   }
 
-  // TODO: Sanitize name input
-  const newId = getGameId();
-  games.set(newId, { name: req.body.name, url: `/game/${newId}` });
-  return res.redirect(`/game/${newId}`);
+  const newId = createGameId();
+  const newGame = {
+    id: newId,
+    name: req.body.name, // TODO: Sanitize name input
+    url: `/game/${newId}`,
+    players: [getUserId(req)],
+  };
+  games.set(newId, newGame);
+  return res.json(newGame);
 });
 
 // Here we go

@@ -7,5 +7,6 @@ function uuidv4() {
 }
 
 module.exports = {
-  getGameId: uuidv4,
+  createGameId: uuidv4,
+  createUserId: uuidv4,
 };
