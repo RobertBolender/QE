@@ -65,7 +65,7 @@ function JoinOrCreateGame({ setGameState }) {
 function useExistingGames() {
   const [existingGames, setExistingGames] = useState(false);
   const fetchExistingGames = useCallback(async () => {
-    const data = await fetchJson("/games");
+    const data = await getJson("/games");
     setTimeout(() => setExistingGames(data), 1500);
   }, []);
   useEffect(() => {
@@ -94,7 +94,7 @@ function ExistingGames({ games, setGameState }) {
   const handleSubmit = useCallback(
     async (event) => {
       event.preventDefault();
-      const data = await fetchJson(`/game/${gameId}/join`, "POST", {
+      const data = await postJson(`/game/${gameId}/join`, {
         player,
         bid,
       });
@@ -163,7 +163,7 @@ function NewGame({ setGameState }) {
     async (event) => {
       event.preventDefault();
 
-      const data = await fetchJson("/games", "POST", { name, player, bid });
+      const data = await postJson("/games", { name, player, bid });
       setGameState(data);
     },
     [name, player, bid]
@@ -224,4 +224,12 @@ async function fetchJson(url, method = "GET", body = null) {
     body: body ? JSON.stringify(body) : null,
   });
   return await response.json();
+}
+
+async function getJson(url) {
+  return await fetchJson(url);
+}
+
+async function postJson(url, body) {
+  return await fetchJson(url, "POST", body);
 }
