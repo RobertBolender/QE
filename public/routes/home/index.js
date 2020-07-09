@@ -240,6 +240,17 @@ function Game({ gameState = {}, setGameState }) {
     }
     setGameState(data);
   }, [gameState]);
+  const handleFlip = useCallback(async () => {
+    if (!id) {
+      return;
+    }
+    const data = await postJson(`game/${id}/flip`);
+    if (data.errorMessage) {
+      console.error(data.errorMessage);
+      return;
+    }
+    setGameState(data);
+  }, [gameState]);
   return html`<div>
     <h1>QE: ${name}</h1>
     <p>Status: ${status}</p>
@@ -247,6 +258,10 @@ function Game({ gameState = {}, setGameState }) {
     html`<div className="button-set">
       <button onClick=${handleQuit}>Quit</button>
       <button onClick=${handleStart}>Start Game</button>
+    </div>`}
+    ${round !== 0 &&
+    html`<div className="button-set">
+      <button onClick=${handleFlip}>Flip the table</button>
     </div>`}
   </div>`;
 }

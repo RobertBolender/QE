@@ -154,6 +154,32 @@ app.post("/game/:id/start", (req, res) => {
 });
 
 /**
+ * POST /game/:id/flip
+ *
+ * Flip the table and end the selected game. How rude.
+ */
+app.post("/game/:id/flip", (req, res) => {
+  const gameId = req.params.id;
+  if (pendingGames.has(gameId)) {
+    return res.status(400).send("Can't end a game before it starts.");
+  }
+
+  if (!activeGames.has(gameId)) {
+    return res.status(404).send("Game not found.");
+  }
+
+  const userId = getUserId(req);
+  if (activePlayers.get(userId) !== gameId) {
+    return res.status(400).send("You aren't even playing this game!");
+  }
+
+  activePlayers.delete(userId);
+  activeGames.delete(gameId);
+
+  return res.json({});
+});
+
+/**
  * GET /games
  *
  * Get a list of games with links to each game.
