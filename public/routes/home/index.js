@@ -8,7 +8,16 @@ import htm from "https://unpkg.com/htm?module";
 const html = htm.bind(React.createElement);
 
 export default function App() {
-  const [gameState, setGameState] = useState({});
+  const [gameState, setGameState] = useState();
+
+  useEffect(async () => {
+    const data = await getJson("/game/current");
+    setGameState(data);
+  }, []);
+
+  if (!gameState) {
+    return "Loading...";
+  }
 
   if (!gameState.id) {
     return html`<${JoinOrCreateGame} setGameState=${setGameState} />`;

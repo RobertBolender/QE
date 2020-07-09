@@ -14,6 +14,30 @@ app.use(sessionHandler);
 // Game state
 const activeGames = new Map();
 const pendingGames = new Map();
+const activePlayers = new Map();
+
+/**
+ * GET /game/current
+ *
+ * Get the current game, if you are in one
+ */
+app.get("/game/current", (req, res) => {
+  const userId = getUserId(req);
+  if (!userId) {
+    return res.json({});
+  }
+
+  const gameId = activePlayers.get(userId);
+  if (activeGames.has(gameId)) {
+    return res.json(activeGames.get(gameId));
+  }
+
+  if (pendingGames.has(gameId)) {
+    return res.json(pendingGames.get(gameId));
+  }
+
+  return res.json({});
+});
 
 /**
  * GET /game/:id
@@ -51,6 +75,12 @@ app.post("/game/:id/join", (req, res) => {
   if (!req.body.bid) {
     return res.status(400).send("You need a bid to join a game.");
   }
+
+  const userId = getUserId(req);
+  if (activePlayers.has(userId)) {
+    return res.status(400).send("You are already playing a game!");
+  }
+  activePlayers.set(userId, gameId);
 
   const game = pendingGames.get(gameId);
   game.players = [
@@ -102,16 +132,16 @@ app.post("/games", (req, res) => {
     return res.status(400).send("You need a bid to create a game.");
   }
 
-  const newId = createGameId();
+  const gameId = createGameId();
+  const userId = getUserId(req);
   const newGame = {
-    id: newId,
+    id: gameId,
     name: req.body.name, // TODO: Sanitize name input
-    url: `/game/${newId}`,
-    players: [
-      { id: getUserId(req), bid: req.body.bid, player: req.body.player },
-    ],
+    url: `/game/${gameId}`,
+    players: [{ id: userId, bid: req.body.bid, player: req.body.player }],
   };
-  pendingGames.set(newId, newGame);
+  pendingGames.set(gameId, newGame);
+  activePlayers.set(userId, gameId);
   return res.json(newGame);
 });
 
