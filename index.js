@@ -124,6 +124,32 @@ app.post("/game/:id/quit", (req, res) => {
 });
 
 /**
+ * POST /game/:id/start
+ *
+ * Start the selected game.
+ */
+app.post("/game/:id/start", (req, res) => {
+  const gameId = req.params.id;
+  const game = pendingGames.get(gameId);
+  if (!game) {
+    return res.status(404).send("Game not found.");
+  }
+
+  if (game.players.length < 1) {
+    return res.status(400).send("You need at least 3 players to play.");
+  }
+
+  activeGames.set(gameId, {
+    ...game,
+    status: "Waiting for first player to set a starting bid",
+    round: 1,
+  });
+  pendingGames.delete(gameId);
+
+  return res.json(activeGames.get(gameId));
+});
+
+/**
  * GET /games
  *
  * Get a list of games with links to each game.
@@ -149,7 +175,7 @@ app.get("/games", (req, res) => {
 /**
  * POST /games
  *
- * Start a new game.
+ * Create a new pending game.
  */
 app.post("/games", (req, res) => {
   if (!req.body.name) {
@@ -171,6 +197,7 @@ app.post("/games", (req, res) => {
     name: req.body.name, // TODO: Sanitize name input
     url: `/game/${gameId}`,
     status: "Waiting for players",
+    round: 0,
     players: [{ id: userId, bid: req.body.bid, player: req.body.player }],
   };
   pendingGames.set(gameId, newGame);

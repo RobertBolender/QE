@@ -216,21 +216,38 @@ function NewGame({ setGameState }) {
   </div>`;
 }
 
-function Game({ gameState, setGameState }) {
+function Game({ gameState = {}, setGameState }) {
+  const { id, name, status, round } = gameState;
   const handleQuit = useCallback(async () => {
-    if (gameState && gameState.id) {
-      const data = await postJson(`game/${gameState.id}/quit`);
-      if (data.errorMessage) {
-        console.error(data.errorMessage);
-        return;
-      }
-      setGameState(data);
+    if (!id) {
+      return;
     }
+    const data = await postJson(`game/${id}/quit`);
+    if (data.errorMessage) {
+      console.error(data.errorMessage);
+      return;
+    }
+    setGameState(data);
+  }, [gameState]);
+  const handleStart = useCallback(async () => {
+    if (!id) {
+      return;
+    }
+    const data = await postJson(`game/${id}/start`);
+    if (data.errorMessage) {
+      console.error(data.errorMessage);
+      return;
+    }
+    setGameState(data);
   }, [gameState]);
   return html`<div>
-    <h1>QE: ${gameState.name}</h1>
-    <p>Status: ${gameState.status}</p>
-    <button onClick=${handleQuit}>Quit</button>
+    <h1>QE: ${name}</h1>
+    <p>Status: ${status}</p>
+    ${round === 0 &&
+    html`<div className="button-set">
+      <button onClick=${handleQuit}>Quit</button>
+      <button onClick=${handleStart}>Start Game</button>
+    </div>`}
   </div>`;
 }
 
