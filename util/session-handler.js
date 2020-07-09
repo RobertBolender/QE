@@ -2,7 +2,7 @@ const { createUserId } = require("./crypto");
 
 const sendUserIdCookie = (userId, res) => {
   const oneDayToSeconds = 24 * 60 * 60;
-  res.cookie("userId", userId, {
+  res.cookie("qeUserId", userId, {
     maxAge: oneDayToSeconds,
     // If true, deny access to cookie in the client's javascript
     httpOnly: false,
@@ -27,7 +27,7 @@ const getAppCookies = (req) => {
   return parsedCookies;
 };
 
-const getUserId = (req, res) => getAppCookies(req, res)["userId"];
+const getUserId = (req, res) => getAppCookies(req, res)["qeUserId"];
 
 const sessions = {};
 
