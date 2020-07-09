@@ -75,7 +75,7 @@ function useExistingGames() {
   const [existingGames, setExistingGames] = useState(false);
   const fetchExistingGames = useCallback(async () => {
     const data = await getJson("/games");
-    setTimeout(() => setExistingGames(data), 1500);
+    setTimeout(() => setExistingGames(data), 150);
   }, []);
   useEffect(() => {
     fetchExistingGames();
