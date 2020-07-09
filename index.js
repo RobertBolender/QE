@@ -159,6 +159,7 @@ app.post("/game/:id/start", (req, res) => {
     return res.status(404).send("Game not found.");
   }
 
+  // TODO: require 3 players to play
   if (game.players.length < 1) {
     return res.status(400).send("You need at least 3 players to play.");
   }
