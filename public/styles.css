@@ -60,7 +60,8 @@ button:active {
 }
 
 .radio-set > input {
-  display: none;
+  opacity: 0;
+  position: absolute;
 }
 
 .radio-set > input + label {
@@ -84,6 +85,14 @@ button:active {
   height: 2px;
   background: #333;
   transition: all 250ms;
+}
+
+:focus {
+  outline-color: green;
+}
+
+.radio-set > input:focus + label {
+  box-shadow: inset 0 0 0 1px green;
 }
 
 .radio-set > input:checked + label:after {
