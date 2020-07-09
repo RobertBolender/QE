@@ -8,6 +8,7 @@ app.use(express.static("public"));
 
 // Utilities
 const { createGameId } = require("./util/crypto");
+const { shuffle } = require("./util/shuffle");
 const { sessionHandler, getUserId } = require("./util/session-handler");
 app.use(sessionHandler);
 
@@ -139,9 +140,12 @@ app.post("/game/:id/start", (req, res) => {
     return res.status(400).send("You need at least 3 players to play.");
   }
 
+  const shuffledPlayers = shuffle(game.players);
+
   activeGames.set(gameId, {
     ...game,
-    status: "Waiting for first player to set a starting bid",
+    players: shuffledPlayers,
+    status: `Waiting for ${shuffledPlayers[0].player} to set a starting bid`,
     round: 1,
   });
   pendingGames.delete(gameId);
