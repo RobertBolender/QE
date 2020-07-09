@@ -238,7 +238,17 @@ function useCurrentGameState(setGameState, initialGameStateHash) {
 }
 
 function Game({ gameState = {}, setGameState }) {
-  const { hash, id, name, status, round, players } = gameState;
+  const {
+    hash,
+    currentUser,
+    id,
+    name,
+    auctions,
+    players,
+    status,
+    round,
+    turn,
+  } = gameState;
 
   useCurrentGameState(setGameState, hash);
 
@@ -275,6 +285,30 @@ function Game({ gameState = {}, setGameState }) {
     }
     setGameState(data);
   }, [gameState]);
+
+  const currentAuction = auctions[auctions.length - 1];
+  const hasBid = currentUser && currentAuction && !!currentAuction[currentUser];
+  const startingPlayer = players[turn].id;
+  const isStartingBid = startingPlayer === currentUser;
+  const waitingForStartBid =
+    !isStartingBid && currentAuction && !currentAuction[startingPlayer];
+
+  const [bid, setBid] = useState();
+  const bidRef = useRef();
+  const handleSetBid = (event) => setBid(event.target.value);
+  const handleBid = async (event) => {
+    event.preventDefault();
+    const data = await postJson(`/game/${id}/bid`, { bid });
+    if (data.errorMessage) {
+      console.error(data.errorMessage);
+      return;
+    }
+    setGameState(data);
+    if (bidRef.current) {
+      bidRef.current.value = "";
+    }
+  };
+
   return html`<div className="game">
     <div className="status-bar">
       <span className="status-message">${status}</span>
@@ -290,6 +324,20 @@ function Game({ gameState = {}, setGameState }) {
       <button onClick=${handleQuit}>Quit</button>
       <button onClick=${handleStart}>Start Game</button>
     </div>`}
+    ${round !== 0 &&
+    !hasBid &&
+    !waitingForStartBid &&
+    html`<form onSubmit=${handleBid}>
+      <input
+        type="number"
+        min=${isStartingBid ? "1" : "0"}
+        step="1"
+        required
+        onChange=${handleSetBid}
+        ref=${bidRef}
+      />
+      <button type="submit">Bid</button>
+    </form>`}
     ${round !== 0 &&
     html`<div className="button-set">
       <button onClick=${handleFlip}>Flip the table</button>

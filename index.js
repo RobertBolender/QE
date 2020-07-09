@@ -40,7 +40,7 @@ function getGameState(userId, gameId) {
   /**
    * TODO: return game state as should be seen by the current user
    * game.publicInfo
-   *  peeks, rounds, winners
+   *  peeks, auctions, winners
    * game.privateInfo {
    *  userId: { bids, advantage }
    * }
@@ -171,10 +171,72 @@ app.post("/game/:id/start", (req, res) => {
     players: shuffledPlayers,
     status: `Waiting for ${shuffledPlayers[0].player} to set a starting bid`,
     round: 1,
+    turn: 0,
+    auctions: [{}],
   });
   pendingGames.delete(gameId);
 
   return res.json(activeGames.get(gameId));
+});
+
+function getNumberOfBidsInCurrentAuction(gameState) {
+  return gameState.players.reduce((total, player) => {
+    const currentAuction = gameState.auctions[gameState.auctions.length - 1];
+    if (currentAuction[player.id]) {
+      total++;
+    }
+    return total;
+  }, 0);
+}
+
+/**
+ * POST /game/:id/bid
+ *
+ * Attempt to place a bid.
+ */
+app.post("/game/:id/bid", (req, res) => {
+  const gameId = req.params.id;
+  const game = activeGames.get(gameId);
+  if (!game) {
+    return res.status(404).send("Game not found.");
+  }
+
+  const currentAuction = game.auctions[game.auctions.length - 1];
+  const userId = getUserId(req);
+  if (currentAuction[userId]) {
+    return res.status(400).send("You already bid this round.");
+  }
+
+  const priorBidsThisRound = getNumberOfBidsInCurrentAuction(game);
+  const startingBid = !priorBidsThisRound;
+  const finalBid = priorBidsThisRound === game.players.length - 1;
+  const nextTurn = finalBid ? (game.turn + 1) % game.players.length : game.turn;
+
+  const newAuctions = [...game.auctions];
+  // TODO: sanitize bids
+  const bid = req.body.bid;
+  newAuctions[newAuctions.length - 1][userId] = bid;
+
+  let newStatus = game.status;
+  if (startingBid) {
+    newStatus = `Starting bid: ${bid}`;
+  } else if (finalBid) {
+    if (game.round === "last") {
+      newStatus = "Game over!";
+    } else {
+      newStatus = `Waiting for ${game.players[nextTurn].player} to make a starting bid.`;
+      newAuctions.push({});
+    }
+  }
+
+  activeGames.set(gameId, {
+    ...game,
+    status: newStatus,
+    auctions: newAuctions,
+    turn: nextTurn,
+  });
+
+  return res.json(getGameState(userId, gameId));
 });
 
 /**
@@ -252,7 +314,9 @@ app.post("/games", (req, res) => {
     url: `/game/${gameId}`,
     status: "Waiting for players",
     round: 0,
+    auctions: [],
     players: [{ id: userId, bid: req.body.bid, player: req.body.player }],
+    turn: 0,
   };
   pendingGames.set(gameId, newGame);
   activePlayers.set(userId, gameId);
