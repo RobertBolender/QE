@@ -2,6 +2,7 @@
   box-sizing: border-box;
 }
 
+input,
 p {
   margin: 0;
 }
@@ -20,14 +21,21 @@ label {
   font-weight: bold;
 }
 
-input {
+input[type="text"] {
   display: block;
   min-width: 200px;
 }
 
-input,
+input[type="text"],
 select {
   min-height: 22px;
+}
+
+input[type="radio"] {
+  min-height: 16px;
+  min-width: 16px;
+  margin-right: 6px;
+  vertical-align: text-bottom;
 }
 
 button {

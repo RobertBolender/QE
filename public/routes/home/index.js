@@ -75,30 +75,32 @@ function useExistingGames() {
 }
 
 function ExistingGames({ games, setGameState }) {
-  const [id, setId] = useState();
+  const [gameId, setGameId] = useState(
+    games && games.length > 0 ? games[0].id : null
+  );
   const [player, setPlayer] = useState();
   const [bid, setBid] = useState();
 
   const handleSetPlayer = (event) => setPlayer(event.target.value);
   const handleSetBid = (event) => setBid(event.target.value);
 
-  const handleSelect = useCallback(
+  const handleSetGameId = useCallback(
     (event) => {
-      setId(event.target.value);
+      setGameId(event.target.value);
     },
-    [setId]
+    [setGameId]
   );
 
   const handleSubmit = useCallback(
     async (event) => {
       event.preventDefault();
-      const data = await fetchJson(`/game/${id}/join`, "POST", {
+      const data = await fetchJson(`/game/${gameId}/join`, "POST", {
         player,
         bid,
       });
       setGameState(data);
     },
-    [id, player, bid]
+    [gameId, player, bid]
   );
 
   if (!games || !games.length) {
@@ -109,20 +111,18 @@ function ExistingGames({ games, setGameState }) {
     <h1>QE: Join a Game</h1>
     <form onSubmit=${handleSubmit}>
       <label for="game">Pick a Game</label>
-      <select
-        id="game"
-        onChange=${handleSelect}
-        disabled=${games.length === 0}
-        required
-      >
-        <option selected disabled>Choose an existing game</option>
-        ${games.map(
-          (game) =>
-            html`<option value=${game.id}
-              >${game.name} (${game.players.length})</option
-            >`
-        )}
-      </select>
+      ${games.map(
+        (game, index) =>
+          html`<label
+            ><input
+              type="radio"
+              name="game"
+              value=${game.id}
+              onChange=${handleSetGameId}
+              checked=${game.id === gameId}
+            />${game.name} (${game.players.length})</label
+          >`
+      )}
       <label for="player">Your name</label>
       <input
         id="player"
