@@ -32,6 +32,9 @@ function getGameState(userId, gameId) {
     return {};
   }
 
+  const { privateData, ...gameState } = game;
+  gameState.currentUser = userId;
+
   /**
    * TODO: return game state as should be seen by the current user
    * game.publicInfo
@@ -41,7 +44,7 @@ function getGameState(userId, gameId) {
    * }
    */
 
-  return { ...game, hash: hash(game) };
+  return { ...gameState, hash: hash(gameState) };
 }
 
 /**
