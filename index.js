@@ -24,7 +24,9 @@ const activePlayers = new Map();
 function getGameState(userId, gameId) {
   let game = pendingGames.get(gameId);
   if (game) {
-    return { ...game, hash: hash(game) };
+    const gameState = { ...game };
+    gameState.currentUser = userId;
+    return { ...gameState, hash: hash(gameState) };
   }
 
   game = activeGames.get(gameId);
