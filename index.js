@@ -92,6 +92,38 @@ app.post("/game/:id/join", (req, res) => {
 });
 
 /**
+ * POST /game/:id/quit
+ *
+ * Quit the selected game.
+ */
+app.post("/game/:id/quit", (req, res) => {
+  const gameId = req.params.id;
+  if (activeGames.has(gameId)) {
+    return res.status(400).send("Can't leave an active game.");
+  }
+
+  if (!pendingGames.has(gameId)) {
+    return res.status(404).send("Game not found.");
+  }
+
+  const userId = getUserId(req);
+  if (activePlayers.get(userId) !== gameId) {
+    return res.status(400).send("You aren't even playing this game!");
+  }
+
+  activePlayers.delete(userId);
+
+  const game = pendingGames.get(gameId);
+  game.players = [...game.players.filter((player) => player.id !== userId)];
+
+  if (game.players.length === 0) {
+    pendingGames.delete(gameId);
+  }
+
+  return res.json({});
+});
+
+/**
  * GET /games
  *
  * Get a list of games with links to each game.

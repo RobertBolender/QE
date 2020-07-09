@@ -23,7 +23,7 @@ export default function App() {
     return html`<${JoinOrCreateGame} setGameState=${setGameState} />`;
   }
 
-  return html`<${Game} gameState=${gameState} />`;
+  return html`<${Game} gameState=${gameState} setGameState=${setGameState} />`;
 }
 
 function JoinOrCreateGame({ setGameState }) {
@@ -216,10 +216,21 @@ function NewGame({ setGameState }) {
   </div>`;
 }
 
-function Game({ gameState }) {
+function Game({ gameState, setGameState }) {
+  const handleQuit = useCallback(async () => {
+    if (gameState && gameState.id) {
+      const data = await postJson(`game/${gameState.id}/quit`);
+      if (data.errorMessage) {
+        console.error(data.errorMessage);
+        return;
+      }
+      setGameState(data);
+    }
+  }, [gameState]);
   return html`<div>
     <h1>QE: ${gameState.name}</h1>
     <p>Status: ${gameState.status}</p>
+    <button onClick=${handleQuit}>Quit</button>
   </div>`;
 }
 
@@ -232,7 +243,14 @@ async function fetchJson(url, method = "GET", body = null) {
     },
     body: body ? JSON.stringify(body) : null,
   });
-  return await response.json();
+  if (response.status === 200) {
+    return await response.json();
+  } else {
+    return {
+      status: response.status,
+      errorMessage: await response.text(),
+    };
+  }
 }
 
 async function getJson(url) {
