@@ -218,8 +218,8 @@ function NewGame({ setGameState }) {
 
 function Game({ gameState }) {
   return html`<div>
-    <h1>QE: Game</h1>
-    <p>${gameState.id}</p>
+    <h1>QE: ${gameState.name}</h1>
+    <p>Status: ${gameState.status}</p>
   </div>`;
 }
 

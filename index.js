@@ -138,6 +138,7 @@ app.post("/games", (req, res) => {
     id: gameId,
     name: req.body.name, // TODO: Sanitize name input
     url: `/game/${gameId}`,
+    status: "Waiting for players",
     players: [{ id: userId, bid: req.body.bid, player: req.body.player }],
   };
   pendingGames.set(gameId, newGame);
