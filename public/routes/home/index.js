@@ -217,10 +217,8 @@ function NewGame({ setGameState }) {
   </div>`;
 }
 
-function Game({ gameState = {}, setGameState }) {
-  const { hash, id, name, status, round, players } = gameState;
-
-  const lastSeenHash = useRef(hash);
+function useCurrentGameState(setGameState, initialGameStateHash) {
+  const lastSeenHash = useRef(initialGameStateHash);
   useEffect(() => {
     const timer = setInterval(async () => {
       const data = await getJson(`/game/current`);
@@ -237,6 +235,12 @@ function Game({ gameState = {}, setGameState }) {
       clearInterval(timer);
     };
   }, [lastSeenHash, setGameState]);
+}
+
+function Game({ gameState = {}, setGameState }) {
+  const { hash, id, name, status, round, players } = gameState;
+
+  useCurrentGameState(setGameState, hash);
 
   const handleQuit = useCallback(async () => {
     if (!id) {
