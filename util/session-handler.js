@@ -1,9 +1,10 @@
 const { createUserId } = require("./crypto");
 
 const sendUserIdCookie = (userId, res) => {
-  const oneDayToSeconds = 24 * 60 * 60;
+  const oneDayToMilliseconds = 24 * 60 * 60 * 1000;
   res.cookie("qeUserId", userId, {
-    maxAge: oneDayToSeconds,
+    // HTTP Set-Cookie uses seconds, Express res.cookie uses milliseconds
+    maxAge: oneDayToMilliseconds,
     // If true, deny access to cookie in the client's javascript
     httpOnly: false,
     // If true, deny access to insecure http:// connection
