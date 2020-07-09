@@ -9,6 +9,7 @@
     "start:app": "npx servor public/ --browse --reload"
   },
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "object-hash": "^2.0.3"
   }
 }

@@ -2,6 +2,7 @@ import {
   React,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from "https://unpkg.com/es-react";
 import htm from "https://unpkg.com/htm?module";
@@ -217,7 +218,26 @@ function NewGame({ setGameState }) {
 }
 
 function Game({ gameState = {}, setGameState }) {
-  const { id, name, status, round } = gameState;
+  const { hash, id, name, status, round, players } = gameState;
+
+  const lastSeenHash = useRef(hash);
+  useEffect(() => {
+    const timer = setInterval(async () => {
+      const data = await getJson(`/game/current`);
+      if (data.errorMessage) {
+        console.error(data.errorMessage);
+        return;
+      }
+      if (lastSeenHash.current !== data.hash) {
+        lastSeenHash.current = data.hash;
+        setGameState(data);
+      }
+    }, 2000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, [lastSeenHash, setGameState]);
+
   const handleQuit = useCallback(async () => {
     if (!id) {
       return;
@@ -257,6 +277,10 @@ function Game({ gameState = {}, setGameState }) {
       <span className="animate-flicker">🕑</span>
     </div>
     <h1>QE: ${name}</h1>
+    <p>Players:</p>
+    <ul>
+      ${players.map((player) => html`<li>${player.player}</li>`)}
+    </ul>
     ${round === 0 &&
     html`<div className="button-set">
       <button onClick=${handleQuit}>Quit</button>

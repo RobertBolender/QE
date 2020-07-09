@@ -7,6 +7,7 @@ app.use(express.json());
 app.use(express.static("public"));
 
 // Utilities
+const hash = require("object-hash");
 const { createGameId } = require("./util/crypto");
 const { shuffle } = require("./util/shuffle");
 const { sessionHandler, getUserId } = require("./util/session-handler");
@@ -16,6 +17,32 @@ app.use(sessionHandler);
 const activeGames = new Map();
 const pendingGames = new Map();
 const activePlayers = new Map();
+
+/**
+ * Get the game state information the current user is allowed to see.
+ */
+function getGameState(userId, gameId) {
+  let game = pendingGames.get(gameId);
+  if (game) {
+    return { ...game, hash: hash(game) };
+  }
+
+  game = activeGames.get(gameId);
+  if (!game) {
+    return {};
+  }
+
+  /**
+   * TODO: return game state as should be seen by the current user
+   * game.publicInfo
+   *  peeks, rounds, winners
+   * game.privateInfo {
+   *  userId: { bids, advantage }
+   * }
+   */
+
+  return { ...game, hash: hash(game) };
+}
 
 /**
  * GET /game/current
@@ -29,15 +56,7 @@ app.get("/game/current", (req, res) => {
   }
 
   const gameId = activePlayers.get(userId);
-  if (activeGames.has(gameId)) {
-    return res.json(activeGames.get(gameId));
-  }
-
-  if (pendingGames.has(gameId)) {
-    return res.json(pendingGames.get(gameId));
-  }
-
-  return res.json({});
+  return res.json(getGameState(userId, gameId));
 });
 
 /**
@@ -47,15 +66,14 @@ app.get("/game/current", (req, res) => {
  */
 app.get("/game/:id", (req, res) => {
   const gameId = req.params.id;
-  if (activeGames.has(gameId)) {
-    return res.json(activeGames.get(gameId));
+  const userId = getUserId(req);
+  const gameState = getGameState(userId, gameId);
+
+  if (!gameState.id) {
+    return res.status(400).send("Game not found.");
   }
 
-  if (pendingGames.has(gameId)) {
-    return res.json(pendingGames.get(gameId));
-  }
-
-  return res.status(400).send("Game not found.");
+  return res.json(gameState);
 });
 
 /**
