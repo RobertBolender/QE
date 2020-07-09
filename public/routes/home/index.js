@@ -251,9 +251,12 @@ function Game({ gameState = {}, setGameState }) {
     }
     setGameState(data);
   }, [gameState]);
-  return html`<div>
+  return html`<div className="game">
+    <div className="status-bar">
+      <span className="status-message">${status}</span>
+      <span className="animate-flicker">🕑</span>
+    </div>
     <h1>QE: ${name}</h1>
-    <p>Status: ${status}</p>
     ${round === 0 &&
     html`<div className="button-set">
       <button onClick=${handleQuit}>Quit</button>
