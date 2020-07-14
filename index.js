@@ -10,6 +10,7 @@ app.use(express.static("public"));
 const hash = require("object-hash");
 const { createGameId } = require("./util/crypto");
 const { shuffle } = require("./util/shuffle");
+const { sanitizeNumericInput } = require("./util/input");
 const { sessionHandler, getUserId } = require("./util/session-handler");
 app.use(sessionHandler);
 
@@ -107,9 +108,10 @@ app.post("/game/:id/join", (req, res) => {
   activePlayers.set(userId, gameId);
 
   const game = pendingGames.get(gameId);
+  const bid = sanitizeNumericInput(req.body.bid);
   game.players = [
     ...game.players,
-    { id: getUserId(req), bid: req.body.bid, player: req.body.player },
+    { id: getUserId(req), bid, player: req.body.player },
   ];
 
   return res.json(pendingGames.get(gameId));
@@ -213,8 +215,7 @@ app.post("/game/:id/bid", (req, res) => {
   const nextTurn = finalBid ? (game.turn + 1) % game.players.length : game.turn;
 
   const newAuctions = [...game.auctions];
-  // TODO: sanitize bids
-  const bid = req.body.bid;
+  const bid = sanitizeNumericInput(req.body.bid);
   newAuctions[newAuctions.length - 1][userId] = bid;
 
   let newStatus = game.status;
@@ -308,6 +309,7 @@ app.post("/games", (req, res) => {
 
   const gameId = createGameId();
   const userId = getUserId(req);
+  const bid = sanitizeNumericInput(req.body.bid);
   const newGame = {
     id: gameId,
     name: req.body.name, // TODO: Sanitize name input
@@ -315,7 +317,7 @@ app.post("/games", (req, res) => {
     status: "Waiting for players",
     round: 0,
     auctions: [],
-    players: [{ id: userId, bid: req.body.bid, player: req.body.player }],
+    players: [{ id: userId, bid, player: req.body.player }],
     turn: 0,
   };
   pendingGames.set(gameId, newGame);
