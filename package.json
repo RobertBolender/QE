@@ -6,7 +6,8 @@
   "license": "MIT",
   "scripts": {
     "start:server": "node index.js",
-    "start:app": "npx servor public/ --browse --reload"
+    "start:app": "npx servor public/ --browse --reload",
+    "deploy": "scp -rq ./* robert@robertbolender.com:/var/www/qe.robertbolender.com/"
   },
   "dependencies": {
     "express": "^4.17.1",
