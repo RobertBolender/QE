@@ -14,6 +14,9 @@ const { sanitizeNumericInput, sanitizeStringInput } = require("./util/input");
 const { sessionHandler, getUserId } = require("./util/session-handler");
 app.use(sessionHandler);
 
+// Game data
+const { companiesByPlayerCount } = require("./data/companies");
+
 // Game state
 const activeGames = new Map();
 const pendingGames = new Map();
@@ -164,7 +167,17 @@ app.post("/game/:id/start", (req, res) => {
     return res.status(400).send("You need at least 3 players to play.");
   }
 
+  // TODO: split the players into multiple games instead
+  if (game.players.length > 5) {
+    return res.status(400).send("You can't play with more than 5 players.");
+  }
+
   const shuffledPlayers = shuffle(game.players);
+  const shuffledCompanies = shuffle(
+    companiesByPlayerCount[
+      shuffledPlayers.length < 3 ? 3 : shuffledPlayers.length
+    ]
+  );
 
   activeGames.set(gameId, {
     ...game,
@@ -172,7 +185,10 @@ app.post("/game/:id/start", (req, res) => {
     status: `Waiting for ${shuffledPlayers[0].player} to set a starting bid`,
     round: 1,
     turn: 0,
-    auctions: [{}],
+    auctions: [shuffledCompanies.pop()],
+    privateData: {
+      upcomingAuctions: shuffledCompanies,
+    },
   });
   pendingGames.delete(gameId);
 
@@ -220,11 +236,11 @@ app.post("/game/:id/bid", (req, res) => {
   if (startingBid) {
     newStatus = `Starting bid: ${bid}`;
   } else if (finalBid) {
-    if (game.round === "last") {
+    if (game.privateData.upcomingAuctions.length === 0) {
       newStatus = "Game over!";
     } else {
       newStatus = `Waiting for ${game.players[nextTurn].player} to make a starting bid.`;
-      newAuctions.push({});
+      newAuctions.push(game.privateData.upcomingAuctions.pop());
     }
   }
 

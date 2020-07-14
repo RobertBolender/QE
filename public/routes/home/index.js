@@ -328,6 +328,10 @@ function Game({ gameState = {}, setGameState }) {
     !hasBid &&
     !waitingForStartBid &&
     html`<form onSubmit=${handleBid}>
+      ${currentAuction.country &&
+      html`<label>Country: ${currentAuction.country}</label
+        ><label>Sector: ${currentAuction.sector}</label
+        ><label>Value: ${currentAuction.value}</label>`}
       <input
         type="number"
         min=${isStartingBid ? "1" : "0"}
