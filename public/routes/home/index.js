@@ -317,11 +317,7 @@ function Game({ gameState = {}, setGameState }) {
       <span className="status-message">${status}</span>
       <span className="animate-flicker">🕑</span>
     </div>
-    <h1>QE: ${name}</h1>
-    <p>Players:</p>
-    <ul>
-      ${players.map((player) => html`<li>${player.player}</li>`)}
-    </ul>
+    <h1>QE</h1>
     ${round === 0 &&
     html`<div className="button-set">
       <button onClick=${handleQuit}>Quit</button>
@@ -345,6 +341,11 @@ function Game({ gameState = {}, setGameState }) {
       />
       <button type="submit">Bid</button>
     </form>`}
+    <h2>Game: ${name}</h2>
+    <p>Players:</p>
+    <ul>
+      ${players.map((player) => html`<li>${player.player}</li>`)}
+    </ul>
     ${round !== 0 &&
     html`<div className="button-set">
       <button onClick=${handleFlip}>Flip the table</button>
