@@ -10,7 +10,7 @@ app.use(express.static("public"));
 const hash = require("object-hash");
 const { createGameId } = require("./util/crypto");
 const { shuffle } = require("./util/shuffle");
-const { sanitizeNumericInput } = require("./util/input");
+const { sanitizeNumericInput, sanitizeStringInput } = require("./util/input");
 const { sessionHandler, getUserId } = require("./util/session-handler");
 app.use(sessionHandler);
 
@@ -93,11 +93,13 @@ app.post("/game/:id/join", (req, res) => {
     return res.status(404).send("Game not found.");
   }
 
-  if (!req.body.player) {
+  const player = sanitizeStringInput(req.body.player);
+  if (!player) {
     return res.status(400).send("You need a name to create a game.");
   }
 
-  if (!req.body.bid) {
+  const bid = sanitizeNumericInput(req.body.bid);
+  if (!bid) {
     return res.status(400).send("You need a bid to join a game.");
   }
 
@@ -108,11 +110,7 @@ app.post("/game/:id/join", (req, res) => {
   activePlayers.set(userId, gameId);
 
   const game = pendingGames.get(gameId);
-  const bid = sanitizeNumericInput(req.body.bid);
-  game.players = [
-    ...game.players,
-    { id: getUserId(req), bid, player: req.body.player },
-  ];
+  game.players = [...game.players, { id: getUserId(req), bid, player }];
 
   return res.json(pendingGames.get(gameId));
 });
@@ -295,33 +293,38 @@ app.get("/games", (req, res) => {
  * Create a new pending game.
  */
 app.post("/games", (req, res) => {
-  if (!req.body.name) {
+  const name = sanitizeStringInput(req.body.name);
+  if (!name) {
     return res.status(400).send("The game needs a name.");
   }
 
-  if (!req.body.player) {
+  const player = sanitizeStringInput(req.body.player);
+  if (!player) {
     return res.status(400).send("You need a name to create a game.");
   }
 
-  if (!req.body.bid) {
+  const bid = sanitizeNumericInput(req.body.bid);
+  if (!bid) {
     return res.status(400).send("You need a bid to create a game.");
   }
 
   const gameId = createGameId();
   const userId = getUserId(req);
-  const bid = sanitizeNumericInput(req.body.bid);
+
   const newGame = {
     id: gameId,
-    name: req.body.name, // TODO: Sanitize name input
+    name,
     url: `/game/${gameId}`,
     status: "Waiting for players",
     round: 0,
     auctions: [],
-    players: [{ id: userId, bid, player: req.body.player }],
+    players: [{ id: userId, bid, player }],
     turn: 0,
   };
+
   pendingGames.set(gameId, newGame);
   activePlayers.set(userId, gameId);
+
   return res.json(newGame);
 });
 

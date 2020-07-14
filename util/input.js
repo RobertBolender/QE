@@ -7,6 +7,11 @@ function sanitizeNumericInput(input) {
   return parsed;
 }
 
+function sanitizeStringInput(input) {
+  return input;
+}
+
 module.exports = {
   sanitizeNumericInput,
+  sanitizeStringInput,
 };
