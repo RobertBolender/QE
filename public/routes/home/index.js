@@ -275,7 +275,10 @@ function Game({ gameState = {}, setGameState }) {
     setGameState(data);
   }, [gameState]);
   const handleFlip = useCallback(async () => {
-    if (!id) {
+    if (
+      !id ||
+      !confirm("This will end the game. Are you sure you want to do this?")
+    ) {
       return;
     }
     const data = await postJson(`game/${id}/flip`);
