@@ -265,7 +265,8 @@ app.post("/game/:id/flip", (req, res) => {
     return res.status(400).send("Can't end a game before it starts.");
   }
 
-  if (!activeGames.has(gameId)) {
+  const game = activeGames.get(gameId);
+  if (!game) {
     return res.status(404).send("Game not found.");
   }
 
@@ -274,7 +275,7 @@ app.post("/game/:id/flip", (req, res) => {
     return res.status(400).send("You aren't even playing this game!");
   }
 
-  activePlayers.delete(userId);
+  game.players.forEach((player) => activePlayers.delete(player.id));
   activeGames.delete(gameId);
 
   return res.json({});
