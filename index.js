@@ -150,10 +150,15 @@ app.post("/game/:id/quit", (req, res) => {
   activePlayers.delete(userId);
 
   const game = pendingGames.get(gameId);
-  game.players = [...game.players.filter((player) => player.id !== userId)];
+  const update = reduce(game, {
+    type: "QUIT",
+    userId,
+  });
 
-  if (game.players.length === 0) {
+  if (update.players.length === 0) {
     pendingGames.delete(gameId);
+  } else {
+    pendingGames.set(gameId, update);
   }
 
   return res.json({});

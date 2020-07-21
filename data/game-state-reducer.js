@@ -18,6 +18,13 @@ function reduce(state, action) {
         ...state,
         players: [...state.players, action.player],
       };
+    case "QUIT":
+      return {
+        ...state,
+        players: [
+          ...state.players.filter((player) => player.id !== action.userId),
+        ],
+      };
   }
   return state;
 }
