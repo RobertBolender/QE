@@ -2,8 +2,9 @@
 
 ## MVP
 
+- [x] tests
+- [x] disallow bids equal to starting bid
 - [ ] bots
-- [ ] disallow bids equal to starting bid
 - [ ] up to 3 rebids for ties, if still tied goes to highest non-tied player
 - [ ] 3-player no rebids on final auction
 - [ ] 5 player peeks
@@ -16,5 +17,4 @@
 
 ## Wishlist
 
-- [ ] tests
 - [ ] React Flip Move for turn order
