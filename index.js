@@ -185,16 +185,6 @@ app.post("/game/:id/start", (req, res) => {
   return res.json(newState);
 });
 
-function getNumberOfBidsInCurrentAuction(gameState) {
-  return gameState.players.reduce((total, player) => {
-    const currentAuction = gameState.auctions[gameState.auctions.length - 1];
-    if (currentAuction[player.id]) {
-      total++;
-    }
-    return total;
-  }, 0);
-}
-
 /**
  * POST /game/:id/bid
  *
@@ -213,35 +203,11 @@ app.post("/game/:id/bid", (req, res) => {
     return res.status(400).send("You already bid this round.");
   }
 
-  const priorBidsThisRound = getNumberOfBidsInCurrentAuction(game);
-  const startingBid = !priorBidsThisRound;
-  const finalBid = priorBidsThisRound === game.players.length - 1;
-  const nextTurn = finalBid ? (game.turn + 1) % game.players.length : game.turn;
-
-  const newAuctions = [...game.auctions];
   const bid = sanitizeNumericInput(req.body.bid);
-  newAuctions[newAuctions.length - 1][userId] = bid;
+  const newState = reduce(game, { type: "BID", bid: { userId, bid } });
 
-  let newStatus = game.status;
-  if (startingBid) {
-    newStatus = `Starting bid: ${bid}`;
-  } else if (finalBid) {
-    if (game.privateData.upcomingAuctions.length === 0) {
-      newStatus = "Game over!";
-    } else {
-      newStatus = `Waiting for ${game.players[nextTurn].player} to make a starting bid.`;
-      newAuctions.push(game.privateData.upcomingAuctions.pop());
-    }
-  }
-
-  activeGames.set(gameId, {
-    ...game,
-    status: newStatus,
-    auctions: newAuctions,
-    turn: nextTurn,
-  });
-
-  return res.json(getGameState(userId, gameId));
+  activeGames.set(gameId, newState);
+  return res.json(newState);
 });
 
 /**

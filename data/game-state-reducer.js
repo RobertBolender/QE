@@ -47,8 +47,47 @@ function reduce(state, action) {
           upcomingAuctions: shuffledCompanies,
         },
       };
+    case "BID":
+      const priorBidsThisRound = getNumberOfBidsInCurrentAuction(state);
+      const startingBid = !priorBidsThisRound;
+      const finalBid = priorBidsThisRound === state.players.length - 1;
+      const nextTurn = finalBid
+        ? (state.turn + 1) % state.players.length
+        : state.turn;
+
+      const newAuctions = [...state.auctions];
+      newAuctions[newAuctions.length - 1][action.userId] = action.bid;
+
+      let newStatus = state.status;
+      if (startingBid) {
+        newStatus = `Starting bid: ${action.bid}`;
+      } else if (finalBid) {
+        if (state.privateData.upcomingAuctions.length === 0) {
+          newStatus = "Game over!";
+        } else {
+          newStatus = `Waiting for ${state.players[nextTurn].player} to make a starting bid.`;
+          newAuctions.push(state.privateData.upcomingAuctions.pop());
+        }
+      }
+
+      return {
+        ...state,
+        status: newStatus,
+        auctions: newAuctions,
+        turn: nextTurn,
+      };
   }
   return state;
+}
+
+function getNumberOfBidsInCurrentAuction(gameState) {
+  return gameState.players.reduce((total, player) => {
+    const currentAuction = gameState.auctions[gameState.auctions.length - 1];
+    if (currentAuction[player.id]) {
+      total++;
+    }
+    return total;
+  }, 0);
 }
 
 module.exports = {
