@@ -49,17 +49,25 @@ function reduce(state, action) {
       };
     case "BID":
       const priorBidsThisRound = getNumberOfBidsInCurrentAuction(state);
-      const startingBid = !priorBidsThisRound;
+      const startingPlayer = state.players[state.turn];
+      const startingBid =
+        state.auctions[state.auctions.length - 1][startingPlayer.id];
       const finalBid = priorBidsThisRound === state.players.length - 1;
       const nextTurn = finalBid
         ? (state.turn + 1) % state.players.length
         : state.turn;
 
+      if (action.bid === startingBid) {
+        return {
+          errorMessage: "You can't bid equal to starting bid.",
+        };
+      }
+
       const newAuctions = [...state.auctions];
       newAuctions[newAuctions.length - 1][action.userId] = action.bid;
 
       let newStatus = state.status;
-      if (startingBid) {
+      if (priorBidsThisRound === 0) {
         newStatus = `Starting bid: ${action.bid}`;
       } else if (finalBid) {
         if (state.privateData.upcomingAuctions.length === 0) {
