@@ -16,6 +16,7 @@ app.use(sessionHandler);
 
 // Game data
 const { companiesByPlayerCount } = require("./data/companies");
+const { reduce } = require("./data/game-state-reducer");
 
 // Game state
 const activeGames = new Map();
@@ -113,9 +114,17 @@ app.post("/game/:id/join", (req, res) => {
   activePlayers.set(userId, gameId);
 
   const game = pendingGames.get(gameId);
-  game.players = [...game.players, { id: getUserId(req), bid, player }];
+  const update = reduce(game, {
+    type: "JOIN",
+    player: { id: getUserId(req), bid, player },
+  });
 
-  return res.json(pendingGames.get(gameId));
+  if (update.errorMessage) {
+    return res.status(400).send(update.errorMessage);
+  }
+
+  pendingGames.set(gameId, update);
+  return res.json(update);
 });
 
 /**
