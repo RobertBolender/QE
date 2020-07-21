@@ -16,7 +16,7 @@ app.use(sessionHandler);
 
 // Game data
 const { companiesByPlayerCount } = require("./data/companies");
-const { reduce } = require("./data/game-state-reducer");
+const { createNewGame, reduce } = require("./data/game-state-reducer");
 
 // Game state
 const activeGames = new Map();
@@ -337,16 +337,7 @@ app.post("/games", (req, res) => {
   const gameId = createGameId();
   const userId = getUserId(req);
 
-  const newGame = {
-    id: gameId,
-    name,
-    url: `/game/${gameId}`,
-    status: "Waiting for players",
-    round: 0,
-    auctions: [],
-    players: [{ id: userId, bid, player }],
-    turn: 0,
-  };
+  const newGame = createNewGame(gameId, name, { id: userId, bid, player });
 
   pendingGames.set(gameId, newGame);
   activePlayers.set(userId, gameId);
