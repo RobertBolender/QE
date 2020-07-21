@@ -113,18 +113,14 @@ app.post("/game/:id/join", (req, res) => {
   }
   activePlayers.set(userId, gameId);
 
-  const game = pendingGames.get(gameId);
-  const update = reduce(game, {
+  const oldState = pendingGames.get(gameId);
+  const newState = reduce(oldState, {
     type: "JOIN",
     player: { id: getUserId(req), bid, player },
   });
 
-  if (update.errorMessage) {
-    return res.status(400).send(update.errorMessage);
-  }
-
-  pendingGames.set(gameId, update);
-  return res.json(update);
+  pendingGames.set(gameId, newState);
+  return res.json(newState);
 });
 
 /**
@@ -149,16 +145,13 @@ app.post("/game/:id/quit", (req, res) => {
 
   activePlayers.delete(userId);
 
-  const game = pendingGames.get(gameId);
-  const update = reduce(game, {
-    type: "QUIT",
-    userId,
-  });
+  const oldState = pendingGames.get(gameId);
+  const newState = reduce(oldState, { type: "QUIT", userId });
 
-  if (update.players.length === 0) {
+  if (newState.players.length === 0) {
     pendingGames.delete(gameId);
   } else {
-    pendingGames.set(gameId, update);
+    pendingGames.set(gameId, newState);
   }
 
   return res.json({});
