@@ -9,13 +9,11 @@ app.use(express.static("public"));
 // Utilities
 const hash = require("object-hash");
 const { createGameId } = require("./util/crypto");
-const { shuffle } = require("./util/shuffle");
 const { sanitizeNumericInput, sanitizeStringInput } = require("./util/input");
 const { sessionHandler, getUserId } = require("./util/session-handler");
 app.use(sessionHandler);
 
 // Game data
-const { companiesByPlayerCount } = require("./data/companies");
 const { createNewGame, reduce } = require("./data/game-state-reducer");
 
 // Game state
@@ -179,27 +177,12 @@ app.post("/game/:id/start", (req, res) => {
     return res.status(400).send("You can't play with more than 5 players.");
   }
 
-  const shuffledPlayers = shuffle(game.players);
-  const shuffledCompanies = shuffle(
-    companiesByPlayerCount[
-      shuffledPlayers.length < 3 ? 3 : shuffledPlayers.length
-    ]
-  );
+  const newState = reduce(game, { type: "START" });
 
-  activeGames.set(gameId, {
-    ...game,
-    players: shuffledPlayers,
-    status: `Waiting for ${shuffledPlayers[0].player} to set a starting bid`,
-    round: 1,
-    turn: 0,
-    auctions: [shuffledCompanies.pop()],
-    privateData: {
-      upcomingAuctions: shuffledCompanies,
-    },
-  });
+  activeGames.set(gameId, newState);
   pendingGames.delete(gameId);
 
-  return res.json(activeGames.get(gameId));
+  return res.json(newState);
 });
 
 function getNumberOfBidsInCurrentAuction(gameState) {

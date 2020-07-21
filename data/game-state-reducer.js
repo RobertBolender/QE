@@ -1,3 +1,6 @@
+const { shuffle } = require("../util/shuffle");
+const { companiesByPlayerCount } = require("./companies");
+
 function createNewGame(gameId, name, player) {
   return {
     id: gameId,
@@ -24,6 +27,25 @@ function reduce(state, action) {
         players: [
           ...state.players.filter((player) => player.id !== action.userId),
         ],
+      };
+    case "START":
+      const shuffledPlayers = shuffle(state.players);
+      const shuffledCompanies = shuffle(
+        companiesByPlayerCount[
+          shuffledPlayers.length < 3 ? 3 : shuffledPlayers.length
+        ]
+      );
+
+      return {
+        ...state,
+        players: shuffledPlayers,
+        status: `Waiting for ${shuffledPlayers[0].player} to set a starting bid`,
+        round: 1,
+        turn: 0,
+        auctions: [shuffledCompanies.pop()],
+        privateData: {
+          upcomingAuctions: shuffledCompanies,
+        },
       };
   }
   return state;
