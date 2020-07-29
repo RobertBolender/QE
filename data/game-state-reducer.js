@@ -15,6 +15,10 @@ function createNewGame(gameId, name, player) {
 }
 
 function reduce(state, action) {
+  if (state.errorMessage) {
+    return state;
+  }
+
   switch (action.type) {
     case "JOIN":
       return {
