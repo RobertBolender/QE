@@ -8,17 +8,26 @@ app.use(express.static("public"));
 
 // Utilities
 const hash = require("object-hash");
-const { createGameId } = require("./util/crypto");
+const { createGameId, createUserId } = require("./util/crypto");
 const { sanitizeNumericInput, sanitizeStringInput } = require("./util/input");
 const { sessionHandler, getUserId } = require("./util/session-handler");
 app.use(sessionHandler);
 
 // Game data
 const { createNewGame, reduce } = require("./data/game-state-reducer");
+function createBot() {
+  return {
+    id: `bot-${createUserId()}`,
+    player: "Computer",
+  };
+}
 
 // Game state
+let testGame = createNewGame("testGameId", "Test Game", createBot());
+testGame = reduce(testGame, { type: "JOIN", player: createBot() });
+testGame = reduce(testGame, { type: "JOIN", player: createBot() });
 const activeGames = new Map();
-const pendingGames = new Map();
+const pendingGames = new Map([["testGameId", testGame]]);
 const activePlayers = new Map();
 
 /**
