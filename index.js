@@ -186,7 +186,7 @@ app.post("/game/:id/start", (req, res) => {
     return res.status(400).send("You can't play with more than 5 players.");
   }
 
-  const newState = reduce(game, { type: "START" });
+  const newState = reduce(game, { type: "START", shuffle: true });
 
   activeGames.set(gameId, newState);
   pendingGames.delete(gameId);
