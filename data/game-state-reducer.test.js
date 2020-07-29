@@ -16,6 +16,20 @@ test("Can create, join, and start a game", () => {
   expect(game.round).toBe(1);
 });
 
+test("Can't bid 0 for starting bid", () => {
+  const player1 = createTestUser();
+  const player2 = createTestUser();
+  const player3 = createTestUser();
+
+  let game = createNewGame("testGameId", "testGameName", player1);
+  game = reduce(game, { type: "JOIN", player: player2 });
+  game = reduce(game, { type: "JOIN", player: player3 });
+  game = reduce(game, { type: "START", shuffle: false });
+
+  game = reduce(game, { type: "BID", userId: player1.id, bid: 0 });
+  expect(game.errorMessage).toBeDefined();
+});
+
 test("Can't bid equal to starting bid", () => {
   const player1 = createTestUser();
   const player2 = createTestUser();
