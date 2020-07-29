@@ -33,24 +33,29 @@ function reduce(state, action) {
         ],
       };
     case "START":
-      const shuffledPlayers = shuffle(state.players);
-      const shuffledCompanies = shuffle(
+      const shuffledPlayers = action.shuffle
+        ? shuffle(state.players)
+        : state.players;
+      const companies =
         companiesByPlayerCount[
           shuffledPlayers.length < 3 ? 3 : shuffledPlayers.length
-        ]
-      );
+        ];
+      const shuffledCompanies = action.shuffle ? shuffle(companies) : companies;
 
-      return {
+      let startingState = {
         ...state,
         players: shuffledPlayers,
         status: `Waiting for ${shuffledPlayers[0].player} to set a starting bid`,
         round: 1,
         turn: 0,
-        auctions: [shuffledCompanies.pop()],
+        auctions: [shuffledCompanies.slice(0, 1)],
         privateData: {
-          upcomingAuctions: shuffledCompanies,
+          upcomingAuctions: shuffledCompanies.slice(1),
         },
       };
+
+      // Check for bot bids, in case the first starting player is a bot
+      return reduce(startingState, { type: "BOT" });
     case "BID":
       const priorBidsThisRound = getNumberOfBidsInCurrentAuction(state);
       const startingPlayer = state.players[state.turn];
@@ -74,6 +79,7 @@ function reduce(state, action) {
       }
 
       const newAuctions = [...state.auctions];
+      const newUpcomingAuctions = [...state.privateData.upcomingAuctions];
       newAuctions[newAuctions.length - 1][action.userId] = action.bid;
 
       let newStatus = state.status;
@@ -84,16 +90,74 @@ function reduce(state, action) {
           newStatus = "Game over!";
         } else {
           newStatus = `Waiting for ${state.players[nextTurn].player} to make a starting bid.`;
-          newAuctions.push(state.privateData.upcomingAuctions.pop());
+          newAuctions.push(newUpcomingAuctions.pop());
         }
       }
 
-      return {
+      let bidState = {
         ...state,
         status: newStatus,
         auctions: newAuctions,
+        privateData: {
+          ...state.privateData,
+          upcomingAuctions: newUpcomingAuctions,
+        },
         turn: nextTurn,
       };
+
+      if (action.userId.substring(0, 4) !== "bot-") {
+        // If the current bid is not a bot, check for bot bids
+        return reduce(bidState, { type: "BOT" });
+      }
+      return bidState;
+    case "BOT":
+      const bots = state.players.filter((x) => x.id.substring(0, 4) === "bot-");
+      if (!bots.length) {
+        // There are no bots in this game
+        return state;
+      }
+
+      let currentAuction = state.auctions[state.auctions.length - 1];
+      if (bots.every((bot) => typeof currentAuction[bot.id] !== "undefined")) {
+        // All bots have already bid in this round
+        return state;
+      }
+
+      const priorBids = getNumberOfBidsInCurrentAuction(state);
+      const startingPlayerIsBot = bots.find(
+        (bot) => state.players[state.turn].id === bot.id
+      );
+      if (priorBids === 0 && !startingPlayerIsBot) {
+        // Waiting for a non-bot player to set a starting bid
+        return state;
+      }
+
+      let botState = { ...state };
+      if (priorBids === 0 && startingPlayerIsBot) {
+        // Set a starting bid for a bot
+        botState = reduce(botState, {
+          type: "BID",
+          userId: startingPlayerIsBot.id,
+          bid: 1,
+        });
+      }
+
+      const oldAuctionLength = botState.auctions.length;
+      currentAuction = botState.auctions[oldAuctionLength - 1];
+      bots.forEach((bot) => {
+        if (!currentAuction[bot.id]) {
+          botState = reduce(botState, { type: "BID", userId: bot.id, bid: 0 });
+        }
+      });
+
+      const newAuctionLength = botState.auctions.length;
+      if (oldAuctionLength !== newAuctionLength) {
+        // The final bid in the previous round was a bot
+        // Now bots need to bid in the new round
+        return reduce(botState, { type: "BOT" });
+      }
+
+      return botState;
   }
   return state;
 }
