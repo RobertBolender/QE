@@ -73,6 +73,8 @@ function reduce(state, action) {
 
       const newAuctions = [...state.auctions];
       const newUpcomingAuctions = [...state.privateData.upcomingAuctions];
+
+      // Record this bid
       newAuctions[newAuctions.length - 1][action.userId] = action.bid;
 
       const isLastBidOfRound = priorBidsThisRound === state.players.length - 1;
@@ -80,26 +82,36 @@ function reduce(state, action) {
 
       let nextTurn = state.turn;
       let newStatus = state.status;
+
+      if (isLastBidOfRound && isFinalRound) {
+        newStatus = "Game over!";
+        return {
+          ...state,
+          status: newStatus,
+          auctions: newAuctions,
+        };
+      }
+
+      const isThreePlayerGame = state.players.length === 3;
+      const isPenultimateAuction =
+        state.privateData.upcomingAuctions.length === 1;
+
+      if (isLastBidOfRound) {
+        newAuctions.push(newUpcomingAuctions.pop());
+      }
+
+      if (isLastBidOfRound && isThreePlayerGame && isPenultimateAuction) {
+        newStatus = `Final round`;
+        nextTurn = "final";
+      }
+
+      if (isLastBidOfRound && !(isThreePlayerGame && isPenultimateAuction)) {
+        newStatus = `Waiting for ${state.players[nextTurn].player} to make a starting bid.`;
+        nextTurn = (state.turn + 1) % state.players.length;
+      }
+
       if (priorBidsThisRound === 0) {
         newStatus = `Starting bid: ${action.bid}`;
-      } else if (isLastBidOfRound) {
-        if (isFinalRound) {
-          newStatus = "Game over!";
-        } else {
-          const isThreePlayerGame = state.players.length === 3;
-          const isPenultimateAuction =
-            state.privateData.upcomingAuctions.length === 1;
-
-          if (isThreePlayerGame && isPenultimateAuction) {
-            newStatus = `Final round`;
-            newAuctions.push(newUpcomingAuctions.pop());
-            nextTurn = "final";
-          } else {
-            newStatus = `Waiting for ${state.players[nextTurn].player} to make a starting bid.`;
-            newAuctions.push(newUpcomingAuctions.pop());
-            nextTurn = (state.turn + 1) % state.players.length;
-          }
-        }
       }
 
       let bidState = {
