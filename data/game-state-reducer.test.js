@@ -11,6 +11,7 @@ test("Can create, join, and start a game", () => {
   game = reduce(game, { type: "JOIN", player: createBot() });
   expect(game.players.length).toBe(3);
 
+  expect(game.round).toBe(0);
   game = reduce(game, { type: "START" });
   expect(game.round).toBe(1);
 });
@@ -39,8 +40,10 @@ test("3 player game ends after 16 bids", () => {
   let game = createNewGame("testGameId", "testGameName", player1);
   game = reduce(game, { type: "JOIN", player: player2 });
   game = reduce(game, { type: "JOIN", player: player3 });
-  game = reduce(game, { type: "START", shuffle: false });
 
+  expect(game.auctions).toHaveLength(0);
+  expect(game.privateData).toBeUndefined();
+  game = reduce(game, { type: "START", shuffle: false });
   expect(game.auctions).toHaveLength(1);
   expect(game.privateData.upcomingAuctions).toHaveLength(15);
 
@@ -90,8 +93,10 @@ test("4 player game ends after 16 bids", () => {
   game = reduce(game, { type: "JOIN", player: player2 });
   game = reduce(game, { type: "JOIN", player: player3 });
   game = reduce(game, { type: "JOIN", player: player4 });
-  game = reduce(game, { type: "START", shuffle: false });
 
+  expect(game.auctions).toHaveLength(0);
+  expect(game.privateData).toBeUndefined();
+  game = reduce(game, { type: "START", shuffle: false });
   expect(game.auctions).toHaveLength(1);
   expect(game.privateData.upcomingAuctions).toHaveLength(15);
 
