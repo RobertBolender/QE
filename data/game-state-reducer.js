@@ -55,11 +55,8 @@ function reduce(state, action) {
       return reduce(startingState, { type: "BOT" });
     case "BID":
       const priorBidsThisRound = getNumberOfBidsInCurrentAuction(state);
-      const startingPlayer = state.players[state.turn];
-      const startingBid =
-        state.auctions[state.auctions.length - 1][startingPlayer.id];
       const finalBid = priorBidsThisRound === state.players.length - 1;
-      const nextTurn = finalBid
+      let nextTurn = finalBid
         ? (state.turn + 1) % state.players.length
         : state.turn;
 
@@ -69,6 +66,10 @@ function reduce(state, action) {
         };
       }
 
+      const startingPlayer = state.players[state.turn];
+      const startingBid =
+        startingPlayer &&
+        state.auctions[state.auctions.length - 1][startingPlayer.id];
       if (action.bid === startingBid) {
         return {
           errorMessage: "You can't bid equal to starting bid.",
@@ -79,6 +80,10 @@ function reduce(state, action) {
       const newUpcomingAuctions = [...state.privateData.upcomingAuctions];
       newAuctions[newAuctions.length - 1][action.userId] = action.bid;
 
+      const isThreePlayerGame = state.players.length === 3;
+      const isPenultimateAuction =
+        state.privateData.upcomingAuctions.length === 1;
+
       let newStatus = state.status;
       if (priorBidsThisRound === 0) {
         newStatus = `Starting bid: ${action.bid}`;
@@ -86,8 +91,14 @@ function reduce(state, action) {
         if (state.privateData.upcomingAuctions.length === 0) {
           newStatus = "Game over!";
         } else {
-          newStatus = `Waiting for ${state.players[nextTurn].player} to make a starting bid.`;
-          newAuctions.push(newUpcomingAuctions.pop());
+          if (isThreePlayerGame && isPenultimateAuction) {
+            newStatus = `Final round`;
+            newAuctions.push(newUpcomingAuctions.pop());
+            nextTurn = "final";
+          } else {
+            newStatus = `Waiting for ${state.players[nextTurn].player} to make a starting bid.`;
+            newAuctions.push(newUpcomingAuctions.pop());
+          }
         }
       }
 
@@ -121,9 +132,9 @@ function reduce(state, action) {
       }
 
       const priorBids = getNumberOfBidsInCurrentAuction(state);
-      const startingPlayerIsBot = bots.find(
-        (bot) => state.players[state.turn].id === bot.id
-      );
+      const startingPlayerIsBot =
+        Number.isInteger(state.turn) &&
+        bots.find((bot) => state.players[state.turn].id === bot.id);
       if (priorBids === 0 && !startingPlayerIsBot) {
         // Waiting for a non-bot player to set a starting bid
         return state;
