@@ -213,7 +213,7 @@ app.post("/game/:id/bid", (req, res) => {
   }
 
   const bid = sanitizeNumericInput(req.body.bid);
-  const newState = reduce(game, { type: "BID", bid: { userId, bid } });
+  const newState = reduce(game, { type: "BID", userId, bid });
   if (newState.errorMessage) {
     return res.status(400).send(newState.errorMessage);
   }
