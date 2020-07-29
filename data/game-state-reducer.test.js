@@ -16,26 +16,102 @@ test("Can create, join, and start a game", () => {
 });
 
 test("Can't bid equal to starting bid", () => {
-  const player1 = createBot();
-  const player2 = createBot();
-  const player3 = createBot();
+  const player1 = createTestUser();
+  const player2 = createTestUser();
+  const player3 = createTestUser();
 
   let game = createNewGame("testGameId", "testGameName", player1);
   game = reduce(game, { type: "JOIN", player: player2 });
   game = reduce(game, { type: "JOIN", player: player3 });
-  game = reduce(game, { type: "START" });
+  game = reduce(game, { type: "START", shuffle: false });
 
-  const firstPlayer = game.players[game.turn];
-  const secondPlayer = game.players[game.turn + 1];
-  game = reduce(game, { type: "BID", userId: firstPlayer.id, bid: 5 });
-  expect(game.auctions[0][firstPlayer.id]).toBe(5);
-  game = reduce(game, { type: "BID", userId: secondPlayer.id, bid: 5 });
+  game = reduce(game, { type: "BID", userId: player1.id, bid: 5 });
+  expect(game.auctions[0][player1.id]).toBe(5);
+  game = reduce(game, { type: "BID", userId: player2.id, bid: 5 });
   expect(game.errorMessage).toBeDefined();
 });
 
-function createBot() {
+test("4 player game ends after 16 bids", () => {
+  const player1 = createTestUser();
+  const player2 = createBot();
+  const player3 = createBot();
+  const player4 = createBot();
+
+  let game = createNewGame("testGameId", "testGameName", player1);
+  game = reduce(game, { type: "JOIN", player: player2 });
+  game = reduce(game, { type: "JOIN", player: player3 });
+  game = reduce(game, { type: "JOIN", player: player4 });
+  game = reduce(game, { type: "START", shuffle: false });
+
+  expect(game.auctions).toHaveLength(1);
+  expect(game.privateData.upcomingAuctions).toHaveLength(15);
+
+  expect(game.turn).toBe(0);
+  game = reduce(game, { type: "BID", userId: player1.id, bid: 5 });
+  expect(game.turn).toBe(1);
+  game = reduce(game, { type: "BID", userId: player1.id, bid: 5 });
+  expect(game.turn).toBe(2);
+  game = reduce(game, { type: "BID", userId: player1.id, bid: 5 });
+  expect(game.turn).toBe(3);
+  game = reduce(game, { type: "BID", userId: player1.id, bid: 5 });
+  expect(game.turn).toBe(0);
+  game = reduce(game, { type: "BID", userId: player1.id, bid: 5 });
+  expect(game.turn).toBe(1);
+  game = reduce(game, { type: "BID", userId: player1.id, bid: 5 });
+  expect(game.turn).toBe(2);
+  game = reduce(game, { type: "BID", userId: player1.id, bid: 5 });
+  expect(game.turn).toBe(3);
+  game = reduce(game, { type: "BID", userId: player1.id, bid: 5 });
+  expect(game.turn).toBe(0);
+  game = reduce(game, { type: "BID", userId: player1.id, bid: 5 });
+  expect(game.turn).toBe(1);
+  game = reduce(game, { type: "BID", userId: player1.id, bid: 5 });
+  expect(game.turn).toBe(2);
+  game = reduce(game, { type: "BID", userId: player1.id, bid: 5 });
+  expect(game.turn).toBe(3);
+  game = reduce(game, { type: "BID", userId: player1.id, bid: 5 });
+  expect(game.turn).toBe(0);
+  game = reduce(game, { type: "BID", userId: player1.id, bid: 5 });
+  expect(game.turn).toBe(1);
+  game = reduce(game, { type: "BID", userId: player1.id, bid: 5 });
+  expect(game.turn).toBe(2);
+  game = reduce(game, { type: "BID", userId: player1.id, bid: 5 });
+  expect(game.turn).toBe(3);
+  game = reduce(game, { type: "BID", userId: player1.id, bid: 5 });
+
+  expect(game.status).toBe("Game over!");
+});
+
+// test("5 player game ends after 3 rounds", () => {
+//   const player1 = createTestUser();
+//   const player2 = createBot();
+//   const player3 = createBot();
+//   const player4 = createBot();
+//   const player5 = createBot();
+
+//   let game = createNewGame("testGameId", "testGameName", player1);
+//   game = reduce(game, { type: "JOIN", player: player2 });
+//   game = reduce(game, { type: "JOIN", player: player3 });
+//   game = reduce(game, { type: "JOIN", player: player4 });
+//   game = reduce(game, { type: "JOIN", player: player5 });
+//   game = reduce(game, { type: "START", shuffle: false });
+
+//   game = reduce(game, { type: "BID", userId: player1.id, bid: 1 });
+//   game = reduce(game, { type: "BID", userId: player1.id, bid: 2 });
+//   game = reduce(game, { type: "BID", userId: player1.id, bid: 3 });
+//   expect(game.status).toBe("Game over!");
+// });
+
+function createTestUser() {
   return {
     id: createUserId(),
+    player: "Test User",
+  };
+}
+
+function createBot() {
+  return {
+    id: `bot-${createUserId()}`,
     player: "Computer",
   };
 }
