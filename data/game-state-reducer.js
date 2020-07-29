@@ -61,6 +61,12 @@ function reduce(state, action) {
         ? (state.turn + 1) % state.players.length
         : state.turn;
 
+      if (priorBidsThisRound === 0 && action.bid === 0) {
+        return {
+          errorMessage: "You can't set a starting bid at 0.",
+        };
+      }
+
       if (action.bid === startingBid) {
         return {
           errorMessage: "You can't bid equal to starting bid.",
