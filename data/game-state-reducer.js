@@ -36,10 +36,7 @@ function reduce(state, action) {
       const shuffledPlayers = action.shuffle
         ? shuffle(state.players)
         : state.players;
-      const companies =
-        companiesByPlayerCount[
-          shuffledPlayers.length < 3 ? 3 : shuffledPlayers.length
-        ];
+      const companies = companiesByPlayerCount[shuffledPlayers.length];
       const shuffledCompanies = action.shuffle ? shuffle(companies) : companies;
 
       let startingState = {
