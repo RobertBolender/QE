@@ -101,8 +101,8 @@ function reduce(state, action) {
 function getNumberOfBidsInCurrentAuction(gameState) {
   return gameState.players.reduce((total, player) => {
     const currentAuction = gameState.auctions[gameState.auctions.length - 1];
-    if (currentAuction[player.id]) {
-      total++;
+    if (typeof currentAuction[player.id] !== "undefined") {
+      return total + 1;
     }
     return total;
   }, 0);
