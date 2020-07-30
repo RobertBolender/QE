@@ -79,9 +79,69 @@ function reduce(state, action) {
 
       const isLastBidOfRound = priorBidsThisRound === state.players.length - 1;
       const isFinalRound = state.privateData.upcomingAuctions.length === 0;
+      const currentAuction = newAuctions[newAuctions.length - 1];
+      const isThreePlayerGame = state.players.length === 3;
+      const isPenultimateAuction =
+        state.privateData.upcomingAuctions.length === 1;
+
+      const [highestBid, highestBidders] = state.players.reduce(
+        (highest, currentPlayer) => {
+          const currentBid = currentAuction[currentPlayer.id];
+          if (currentBid > highest[0]) {
+            return [currentBid, [currentPlayer]];
+          }
+          if (currentBid === highest[0]) {
+            return [currentBid, [...highest[1], currentPlayer]];
+          }
+          return highest;
+        },
+        [0, []]
+      );
 
       let nextTurn = state.turn;
       let newStatus = state.status;
+
+      if (
+        isLastBidOfRound &&
+        highestBidders.length > 1 &&
+        (!currentAuction.rebid || currentAuction.rebid < 2) &&
+        !(isThreePlayerGame && isFinalRound)
+      ) {
+        const tiedPlayerNames = highestBidders
+          .map((player) => player.player)
+          .join(", ");
+        newStatus = `There was a tie. Waiting for ${tiedPlayerNames} to rebid.`;
+        const rebidAuction = { ...currentAuction };
+        rebidAuction.rebid = rebidAuction.rebid ? rebidAuction.rebid + 1 : 1;
+        highestBidders.forEach((player) => {
+          rebidAuction[player.id] = undefined;
+        });
+        newAuctions.push(rebidAuction);
+        const rebidState = {
+          ...state,
+          status: newStatus,
+          auctions: newAuctions,
+        };
+        return reduce(rebidState, { type: "BOT" });
+      }
+
+      if (isLastBidOfRound && highestBidders.length === 1) {
+        newAuctions[newAuctions.length - 1].winner = highestBidders[0].id;
+      }
+
+      if (
+        isLastBidOfRound &&
+        highestBidders.length > 1 &&
+        currentAuction.rebid === 2 &&
+        !(isThreePlayerGame && isFinalRound)
+      ) {
+        const sorted = getSortedBidsForCurrentAuction(
+          state.players,
+          newAuctions[newAuctions.length - 1]
+        );
+        const winningBid = sorted.find((bid) => bid.bidders.length === 1);
+        newAuctions[newAuctions.length - 1].winner = winningBid.bidders[0].id;
+      }
 
       if (isLastBidOfRound && isFinalRound) {
         newStatus = "Game over!";
@@ -91,10 +151,6 @@ function reduce(state, action) {
           auctions: newAuctions,
         };
       }
-
-      const isThreePlayerGame = state.players.length === 3;
-      const isPenultimateAuction =
-        state.privateData.upcomingAuctions.length === 1;
 
       if (isLastBidOfRound) {
         newAuctions.push(newUpcomingAuctions.pop());
@@ -143,8 +199,8 @@ function reduce(state, action) {
         return state;
       }
 
-      let currentAuction = state.auctions[state.auctions.length - 1];
-      if (bots.every((bot) => typeof currentAuction[bot.id] !== "undefined")) {
+      let thisAuction = state.auctions[state.auctions.length - 1];
+      if (bots.every((bot) => typeof thisAuction[bot.id] !== "undefined")) {
         // All bots have already bid in this round
         return state;
       }
@@ -168,9 +224,9 @@ function reduce(state, action) {
         });
       }
 
-      currentAuction = botState.auctions[botState.auctions.length - 1];
+      thisAuction = botState.auctions[botState.auctions.length - 1];
       bots.forEach((bot) => {
-        if (!currentAuction[bot.id]) {
+        if (!thisAuction[bot.id]) {
           // Bid for each non-starting bot who hasn't bid yet
           botState = reduce(botState, { type: "BID", userId: bot.id, bid: 0 });
         }
@@ -189,6 +245,18 @@ function getNumberOfBidsInCurrentAuction(gameState) {
     }
     return total;
   }, 0);
+}
+
+function getSortedBidsForCurrentAuction(players, auction) {
+  const bids = {};
+  players.forEach((player) => {
+    bids[auction[player.id]] = bids[auction[player.id]]
+      ? [...bids[auction[player.id]], player]
+      : [player];
+  });
+  return Object.entries(bids)
+    .map((entry) => ({ bid: entry[0], bidders: entry[1] }))
+    .sort((a, b) => b.bid - a.bid);
 }
 
 module.exports = {
