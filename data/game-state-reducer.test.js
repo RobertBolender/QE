@@ -247,12 +247,15 @@ test("After a 3rd consecutive tie, the highest non-tied bid wins", () => {
   game = reduce(game, { type: "BID", userId: player2.id, bid: 5 });
   game = reduce(game, { type: "BID", userId: player3.id, bid: 5 });
   expect(game.turn).toBe(0);
+  expect(game.auctions.length).toBe(2);
   game = reduce(game, { type: "BID", userId: player2.id, bid: 5 });
   game = reduce(game, { type: "BID", userId: player3.id, bid: 5 });
   expect(game.turn).toBe(0);
+  expect(game.auctions.length).toBe(3);
   game = reduce(game, { type: "BID", userId: player2.id, bid: 5 });
   game = reduce(game, { type: "BID", userId: player3.id, bid: 5 });
   expect(game.turn).toBe(1);
+  expect(game.auctions.length).toBe(4);
   expect(game.auctions[0].rebid).toBeUndefined();
   expect(game.auctions[0].winner).toBeUndefined();
   expect(game.auctions[1].rebid).toBe(1);
