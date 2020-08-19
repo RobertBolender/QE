@@ -49,7 +49,7 @@ function reduce(state, action) {
         status: `Waiting for ${shuffledPlayers[0].player} to set a starting bid`,
         round: 1,
         turn: 0,
-        auctions: [shuffledCompanies.slice(0, 1)],
+        auctions: shuffledCompanies.slice(0, 1),
         privateData: {
           upcomingAuctions: shuffledCompanies.slice(1),
         },
