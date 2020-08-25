@@ -8,6 +8,7 @@
     "test": "jest",
     "start:server": "node index.js",
     "start:app": "npx servor public/ --browse --reload",
+    "watch:server": "nodemon index.js --ignore public/",
     "deploy": "scp -rq ./* robert@robertbolender.com:/var/www/qe.robertbolender.com/"
   },
   "dependencies": {
