@@ -126,6 +126,73 @@ button:active {
   margin: 0;
 }
 
+.auction-row {
+  display: flex;
+}
+
+.auction-details td {
+  padding: 2px 4px;
+}
+
+.auctioneer-flag > span {
+  width: 30px !important;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid black;
+}
+
+.auction-item {
+  display: grid;
+  height: 180px;
+  width: 180px;
+  grid-template-columns: [left] 1fr [center] 1fr [right] 1fr;
+  grid-template-rows: [top] 1fr [center] 1fr [bottom] 1fr;
+}
+
+.auction-item > :nth-child(1) {
+  grid-row-start: top;
+  grid-row-end: bottom-end;
+  grid-column-start: left;
+  grid-column-end: right-end;
+  height: 180px;
+  width: 180px !important;
+  z-index: 1;
+  opacity: 0.5;
+  border: 1px solid black;
+  border-radius: 50%;
+}
+
+.auction-item > :nth-child(2) {
+  grid-row-start: bottom;
+  grid-row-end: bottom-end;
+  grid-column-start: left;
+  grid-column-end: left-end;
+  z-index: 2;
+}
+
+.auction-item > :nth-child(3) {
+  grid-row-start: bottom;
+  grid-row-end: bottom-end;
+  grid-column-start: right;
+  grid-column-end: right-end;
+  z-index: 3;
+  font-size: 24px;
+}
+
+.auction-item > span {
+  height: 60px;
+  width: 60px;
+}
+
+.value-icon {
+  background-color: #efefef;
+  display: grid;
+  place-items: center;
+  border: 1px solid black;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
 .auction-history {
   border: 1px solid #333;
   border-radius: 0 0 6px 6px;
@@ -208,10 +275,47 @@ button:active {
   justify-content: space-between;
 }
 
-.flags > span {
-  width: 80px;
+.flags > .flag-icon {
+  width: 60px;
+  height: 45px;
+  outline: 1px solid black;
+}
+
+.flags > .sector-icon {
+  width: 60px;
   height: 60px;
   border: 1px solid black;
-  filter: grayscale(80%);
-  opacity: 0.2;
+  outline: none;
+}
+
+.sector-icon {
+  background-color: #efefef;
+  border: 1px solid black;
+  border-radius: 50%;
+}
+
+.icon-agriculture {
+  background-image: url(./icons/agriculture.svg);
+}
+.icon-financial {
+  background-image: url(./icons/financial.svg);
+}
+.icon-government {
+  background-image: url(./icons/government.svg);
+}
+.icon-housing {
+  background-image: url(./icons/housing.svg);
+}
+.icon-manufacturing {
+  background-image: url(./icons/manufacturing.svg);
+}
+
+.icon-agriculture,
+.icon-housing,
+.icon-manufacturing {
+  background-position-y: 5px !important;
+}
+
+.icon-government {
+  background-position-y: 2px !important;
 }

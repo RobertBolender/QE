@@ -345,9 +345,31 @@ function Game({ gameState = {}, setGameState }) {
     !waitingForStartBid &&
     html`<form onSubmit=${handleBid}>
       ${currentAuction.country &&
-      html`<label>Country: ${currentAuction.country}</label
-        ><label>Sector: ${currentAuction.sector}</label
-        ><label>Value: ${currentAuction.value}</label>`}
+      html`<div className="auction-row">
+        <div className="auction-item">
+          ${renderFlag(currentAuction.country)}
+          ${renderSector(currentAuction.sector)}
+          ${renderValue(currentAuction.value)}
+        </div>
+        <table className="auction-details">
+          <tr>
+            <td>Auctioneer:</td>
+            <td>
+              <span className="auctioneer-flag"
+                >${renderFlag(players[turn].country)}</span
+              >
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Starting bid:
+            </td>
+            <td>
+              ${currentAuction[players[turn].id]}
+            </td>
+          </tr>
+        </table>
+      </div>`}
       <input
         type="number"
         min=${isStartingBid ? "1" : "0"}
@@ -427,7 +449,37 @@ function renderFlag(country) {
       countryCode = "cn";
       break;
   }
-  return html`<span className="flag-icon flag-icon-${countryCode}"></span>`;
+  return html`<span
+    className="flag-icon flag-icon-squared flag-icon-${countryCode}"
+  ></span>`;
+}
+
+function renderSector(sector) {
+  let sectorCode = "";
+  switch (sector) {
+    case "AGR":
+      sectorCode = "agriculture";
+      break;
+    case "FIN":
+      sectorCode = "financial";
+      break;
+    case "GOV":
+      sectorCode = "government";
+      break;
+    case "HOU":
+      sectorCode = "housing";
+      break;
+    case "MAN":
+      sectorCode = "manufacturing";
+      break;
+  }
+  return html`<span
+    className="flag-icon sector-icon icon-${sectorCode}"
+  ></span>`;
+}
+
+function renderValue(value) {
+  return html`<span className="value-icon">${value}</span>`;
 }
 
 async function fetchJson(url, method = "GET", body = null) {
