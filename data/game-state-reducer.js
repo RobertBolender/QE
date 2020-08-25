@@ -1,5 +1,6 @@
 const { shuffle } = require("../util/shuffle");
 const { companiesByPlayerCount } = require("./companies");
+const { countriesByPlayerCount } = require("./countries");
 
 function createNewGame(gameId, name, player) {
   return {
@@ -41,7 +42,14 @@ function reduce(state, action) {
       const companies = JSON.parse(
         JSON.stringify(companiesByPlayerCount[shuffledPlayers.length])
       );
+      const countries = JSON.parse(
+        JSON.stringify(countriesByPlayerCount[shuffledPlayers.length])
+      );
       const shuffledCompanies = action.shuffle ? shuffle(companies) : companies;
+      const shuffledCountries = action.shuffle ? shuffle(countries) : countries;
+      for (var i = 0; i < shuffledPlayers.length; i++) {
+        shuffledPlayers[i].country = shuffledCountries[i];
+      }
 
       let startingState = {
         ...state,

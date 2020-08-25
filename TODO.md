@@ -7,7 +7,7 @@
 - [x] bots
 - [x] up to 3 rebids for ties, if still tied goes to highest non-tied player
 - [x] 3-player no rebids on final auction
-- [ ] assign countries to players
+- [x] assign countries to players
 - [ ] auction history
   - [ ] always show starting bid
   - [ ] show rebids for ties
