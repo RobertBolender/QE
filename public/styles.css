@@ -13,8 +13,7 @@ form {
   grid-gap: 12px;
   padding: 16px;
   border: 1px solid #333;
-  border-radius: 6px;
-  max-width: 275px;
+  border-radius: 6px 6px 0 0;
 }
 
 label {
@@ -101,22 +100,56 @@ button:active {
   height: 8px;
 }
 
+.game-lobby,
 .game {
   position: relative;
-  padding-top: 30px;
+  display: grid;
+  grid-auto-rows: auto;
+  grid-gap: 12px;
+  max-width: 500px;
+  margin: auto;
 }
 
 .status-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
   padding: 6px;
   font-size: 16px;
   line-height: 1;
   border-bottom: 2px solid green;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: min-content auto min-content;
+  grid-gap: 12px;
+}
+
+.status-bar > h1 {
+  font-size: 16px;
+  line-height: 1;
+  margin: 0;
+}
+
+.auction-history {
+  border: 1px solid #333;
+  border-radius: 0 0 6px 6px;
+  padding: 8px;
+}
+
+.auction-history tr > :first-child {
+  text-align: left;
+}
+
+.auction-history th,
+.auction-history td {
+  text-align: right;
+  padding: 2px 4px;
+}
+
+.game-details > summary {
+  padding: 8px;
+}
+
+.game-players {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 16px 0;
 }
 
 @keyframes flickerAnimation {

@@ -41,7 +41,7 @@ function JoinOrCreateGame({ setGameState }) {
     return "Loading...";
   }
 
-  return html`<div>
+  return html`<div className="game-lobby">
     <div className="radio-set">
       <input
         id="join"
@@ -254,6 +254,7 @@ function Game({ gameState = {}, setGameState }) {
     currentUser,
     id,
     name,
+    startTime,
     auctions,
     players,
     status,
@@ -330,10 +331,10 @@ function Game({ gameState = {}, setGameState }) {
 
   return html`<div className="game">
     <div className="status-bar">
+      <h1>QE</h1>
       <span className="status-message">${status}</span>
       <span className="animate-flicker">🕑</span>
     </div>
-    <h1>QE</h1>
     ${round === 0 &&
     html`<div className="button-set">
       <button onClick=${handleQuit}>Quit</button>
@@ -357,16 +358,76 @@ function Game({ gameState = {}, setGameState }) {
       />
       <button type="submit">Bid</button>
     </form>`}
-    <h2>Game: ${name}</h2>
-    <p>Players:</p>
-    <ul>
-      ${players.map((player) => html`<li>${player.player}</li>`)}
-    </ul>
+    ${round !== 0 &&
+    html`
+      <div className="auction-history">${renderAuctionHistory(gameState)}</div>
+    `}
+    <details className="game-details">
+      <summary>Game Details: (${name})</summary>
+      <ul className="game-players">
+        ${players.map(
+          (player) =>
+            html`<li>${renderFlag(player.country)} ${player.player}</li>`
+        )}
+      </ul>
+      <p>Start time: ${startTime}</p>
+    </details>
     ${round !== 0 &&
     html`<div className="button-set">
       <button onClick=${handleFlip}>Flip the table</button>
     </div>`}
   </div>`;
+}
+
+function renderAuctionHistory(gameState) {
+  const { auctions, players, currentUser } = gameState;
+  function getPlayerCountry(playerId) {
+    return players.find((player) => player.id === playerId)?.country;
+  }
+  return html`
+    <table>
+      <tr>
+        <th>Company</th>
+        <th>Your Bid</th>
+        <th>Winner</th>
+      </tr>
+      ${auctions.map(
+        (auction) => html`
+          <tr>
+            <td>
+              ${renderFlag(auction.country)} ${auction.sector} ${auction.value}
+            </td>
+            <td>${auction[currentUser]}</td>
+            <td>
+              ${renderFlag(getPlayerCountry(auction.winner))}
+            </td>
+          </tr>
+        `
+      )}
+    </table>
+  `;
+}
+
+function renderFlag(country) {
+  let countryCode = "";
+  switch (country) {
+    case "US":
+      countryCode = "us";
+      break;
+    case "UK":
+      countryCode = "gb";
+      break;
+    case "JP":
+      countryCode = "jp";
+      break;
+    case "EU":
+      countryCode = "eu";
+      break;
+    case "CN":
+      countryCode = "cn";
+      break;
+  }
+  return html`<span className="flag-icon flag-icon-${countryCode}"></span>`;
 }
 
 async function fetchJson(url, method = "GET", body = null) {
