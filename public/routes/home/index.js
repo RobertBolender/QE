@@ -290,11 +290,16 @@ function Game({ gameState = {}, setGameState }) {
   }, [gameState]);
 
   const currentAuction = auctions[auctions.length - 1];
-  const hasBid = currentUser && currentAuction && !!currentAuction[currentUser];
+  const hasBid =
+    currentUser &&
+    currentAuction &&
+    typeof currentAuction[currentUser] !== "undefined";
   const startingPlayer = players[turn].id;
   const isStartingBid = startingPlayer === currentUser;
   const waitingForStartBid =
-    !isStartingBid && currentAuction && !currentAuction[startingPlayer];
+    !isStartingBid &&
+    currentAuction &&
+    typeof currentAuction[startingPlayer] === "undefined";
 
   const [bid, setBid] = useState();
   const bidRef = useRef();
