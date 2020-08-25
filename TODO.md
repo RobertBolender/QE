@@ -8,6 +8,8 @@
 - [x] up to 3 rebids for ties, if still tied goes to highest non-tied player
 - [x] 3-player no rebids on final auction
 - [x] assign countries to players
+- [ ] flag indicators for pending bids
+- [ ] company badges
 - [ ] auction history
   - [ ] always show starting bid
   - [ ] show rebids for ties
