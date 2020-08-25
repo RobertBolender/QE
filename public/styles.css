@@ -186,7 +186,7 @@ button:active {
 
 .value-icon {
   background-color: #efefef;
-  display: grid;
+  display: inline-grid;
   place-items: center;
   border: 1px solid black;
   border-radius: 50%;
@@ -199,14 +199,30 @@ button:active {
   padding: 8px;
 }
 
+.auction-history table {
+  width: 100%;
+}
+
 .auction-history tr > :first-child {
   text-align: left;
+  white-space: nowrap;
 }
 
 .auction-history th,
 .auction-history td {
   text-align: right;
   padding: 2px 4px;
+}
+
+.auction-history .value-icon,
+.auction-history .sector-icon,
+.auction-history .flag-icon {
+  width: 30px !important;
+  height: 30px;
+  border: 1px solid black;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-right: 6px;
 }
 
 .game-details > summary {

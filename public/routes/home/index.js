@@ -410,18 +410,20 @@ function renderAuctionHistory(gameState) {
     <table>
       <tr>
         <th>Company</th>
-        <th>Your Bid</th>
+        ${players.map((player) => html`<th>${player.country}</th>`)}
         <th>Winner</th>
       </tr>
       ${auctions.map(
         (auction) => html`
           <tr>
             <td>
-              ${renderFlag(auction.country)} ${auction.sector} ${auction.value}
+              ${renderFlag(auction.country)}${renderSector(
+                auction.sector
+              )}${renderValue(auction.value)}
             </td>
-            <td>${auction[currentUser]}</td>
+            ${players.map((player) => html`<td>${auction[player.id]}</td>`)}
             <td>
-              ${renderFlag(getPlayerCountry(auction.winner))}
+              ${auction.winner && renderFlag(getPlayerCountry(auction.winner))}
             </td>
           </tr>
         `
