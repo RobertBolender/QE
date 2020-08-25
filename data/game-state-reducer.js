@@ -166,8 +166,8 @@ function reduce(state, action) {
       }
 
       if (isLastBidOfRound && !(isThreePlayerGame && isPenultimateAuction)) {
-        newStatus = `Waiting for ${state.players[nextTurn].player} to make a starting bid.`;
         nextTurn = (state.turn + 1) % state.players.length;
+        newStatus = `Waiting for ${state.players[nextTurn].player} to make a starting bid.`;
       }
 
       if (priorBidsThisRound === 0) {
