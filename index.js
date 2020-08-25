@@ -127,7 +127,7 @@ app.post("/game/:id/join", (req, res) => {
   });
 
   pendingGames.set(gameId, newState);
-  return res.json(newState);
+  return res.json(getGameState(userId, gameId));
 });
 
 /**
@@ -176,6 +176,11 @@ app.post("/game/:id/start", (req, res) => {
     return res.status(404).send("Game not found.");
   }
 
+  const userId = getUserId(req);
+  if (activePlayers.get(userId) !== gameId) {
+    return res.status(400).send("You aren't even playing this game!");
+  }
+
   if (game.players.length < 3) {
     return res.status(400).send("You need at least 3 players to play.");
   }
@@ -190,7 +195,8 @@ app.post("/game/:id/start", (req, res) => {
   activeGames.set(gameId, newState);
   pendingGames.delete(gameId);
 
-  return res.json(newState);
+  return res.json(getGameState(userId, gameId));
+});
 });
 
 /**
@@ -218,7 +224,7 @@ app.post("/game/:id/bid", (req, res) => {
   }
 
   activeGames.set(gameId, newState);
-  return res.json(newState);
+  return res.json(getGameState(userId, gameId));
 });
 
 /**
@@ -300,7 +306,7 @@ app.post("/games", (req, res) => {
   pendingGames.set(gameId, newGame);
   activePlayers.set(userId, gameId);
 
-  return res.json(newGame);
+  return res.json(getGameState(userId, gameId));
 });
 
 // Here we go
