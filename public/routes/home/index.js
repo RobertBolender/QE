@@ -256,7 +256,7 @@ function Game({ gameState = {}, setGameState }) {
     if (!id) {
       return;
     }
-    const data = await postJson(`game/${id}/quit`);
+    const data = await postJson(`/game/${id}/quit`);
     if (data.errorMessage) {
       console.error(data.errorMessage);
       return;
@@ -267,7 +267,7 @@ function Game({ gameState = {}, setGameState }) {
     if (!id) {
       return;
     }
-    const data = await postJson(`game/${id}/start`);
+    const data = await postJson(`/game/${id}/start`);
     if (data.errorMessage) {
       console.error(data.errorMessage);
       return;
@@ -281,7 +281,7 @@ function Game({ gameState = {}, setGameState }) {
     ) {
       return;
     }
-    const data = await postJson(`game/${id}/flip`);
+    const data = await postJson(`/game/${id}/flip`);
     if (data.errorMessage) {
       console.error(data.errorMessage);
       return;
