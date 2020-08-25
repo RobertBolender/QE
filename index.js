@@ -197,6 +197,30 @@ app.post("/game/:id/start", (req, res) => {
 
   return res.json(getGameState(userId, gameId));
 });
+
+/**
+ * POST /game/quickstart
+ *
+ * Start a new game with bots
+ */
+app.post("/game/quickstart", (req, res) => {
+  const gameId = createGameId();
+  const userId = getUserId(req);
+
+  let newGame = createNewGame(gameId, "Quick game", {
+    id: userId,
+    bid: 4,
+    player: "Human",
+  });
+  newGame = reduce(newGame, { type: "JOIN", player: createBot() });
+  newGame = reduce(newGame, { type: "JOIN", player: createBot() });
+  newGame = reduce(newGame, { type: "JOIN", player: createBot() });
+  newGame = reduce(newGame, { type: "START", shuffle: true });
+
+  activeGames.set(gameId, newGame);
+  activePlayers.set(userId, gameId);
+
+  return res.json(getGameState(userId, gameId));
 });
 
 /**

@@ -179,8 +179,19 @@ function NewGame({ setGameState }) {
     [name, player, bid]
   );
 
+  const handleQuickstart = useCallback(async (event) => {
+    event.preventDefault();
+    const data = await postJson("/game/quickstart");
+    setGameState(data);
+  }, []);
+
   return html`<div>
     <h1>QE: Create a Game</h1>
+    <div>
+      <button onClick=${handleQuickstart}>
+        Quickstart
+      </button>
+    </div>
     <form method="POST" action="/games" onSubmit=${handleSubmit}>
       <label for="name">Game name</label>
       <input
