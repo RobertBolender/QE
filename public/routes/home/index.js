@@ -312,7 +312,7 @@ function Game({ gameState = {}, setGameState }) {
     typeof currentAuction[startingPlayer] === "undefined";
 
   const [bid, setBid] = useState();
-  const bidRef = useRef();
+  const formRef = useRef();
   const handleSetBid = (event) => setBid(event.target.value);
   const handleBid = async (event) => {
     event.preventDefault();
@@ -322,8 +322,8 @@ function Game({ gameState = {}, setGameState }) {
       return;
     }
     setGameState(data);
-    if (bidRef.current) {
-      bidRef.current.value = "";
+    if (formRef.current) {
+      formRef.current.reset();
     }
   };
 
@@ -341,7 +341,7 @@ function Game({ gameState = {}, setGameState }) {
     ${round !== 0 &&
     !hasBid &&
     !waitingForStartBid &&
-    html`<form onSubmit=${handleBid}>
+    html`<form onSubmit=${handleBid} ref=${formRef}>
       ${currentAuction.country &&
       html`<div className="auction-row">
         <div className="auction-item">
@@ -358,7 +358,6 @@ function Game({ gameState = {}, setGameState }) {
             step="1"
             required
             onChange=${handleSetBid}
-            ref=${bidRef}
           />
           <button type="submit">Bid</button>
         </div>
