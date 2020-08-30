@@ -287,6 +287,18 @@ button:active {
   padding: 2px 4px;
 }
 
+.scoreboard .radio-set {
+  --radio-set-color: #48bb78;
+  --focus-color: #48bb78;
+}
+
+.scoreboard .radio-set label > span {
+  width: 25px !important;
+  height: 25px;
+  border-radius: 50%;
+  border: 1px solid black;
+}
+
 .bg-green {
   background-color: #48bb78;
   color: white;

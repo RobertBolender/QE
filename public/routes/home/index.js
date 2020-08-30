@@ -390,7 +390,12 @@ function Game({ gameState = {}, setGameState }) {
       />
       <label for="scores">Scoreboard</label>
     </div>`}
-    ${round !== 0 && viewKind === "history" && renderAuctionHistory(gameState)}
+    ${round !== 0 &&
+    viewKind === "history" &&
+    html`<${AuctionHistory} gameState=${gameState} />`}
+    ${round !== 0 &&
+    viewKind === "scores" &&
+    html`<${Scoreboard} gameState=${gameState} />`}
     <details className="game-details">
       <summary>Game Details: (${name})</summary>
       <ul className="game-players">
@@ -427,7 +432,41 @@ function renderBids(gameState) {
   `;
 }
 
-function renderAuctionHistory(gameState) {
+function Scoreboard({ gameState }) {
+  const { auctions, players, currentUser } = gameState;
+  const currentPlayerIndex = players.findIndex(
+    (player) => player.id === currentUser
+  );
+  const currentPlayer = players[currentPlayerIndex];
+  const [viewCountry, setViewCountry] = useState(currentPlayer.country);
+  const playersWithCurrentPlayerFirst = [...players, ...players].slice(
+    currentPlayerIndex,
+    currentPlayerIndex + players.length
+  );
+  return html`
+    <div className="scoreboard">
+      <div className="radio-set">
+        ${playersWithCurrentPlayerFirst.map(
+          (player) => html`<input
+              id="scoreboard-${player.country}"
+              type="radio"
+              name="scoreboardViewKind"
+              checked=${viewCountry === player.country}
+              onChange=${() => setViewCountry(player.country)}
+            />
+            <label for="scoreboard-${player.country}"
+              >${renderFlag(
+                player.country,
+                viewCountry === player.country
+              )}</label
+            >`
+        )}
+      </div>
+    </div>
+  `;
+}
+
+function AuctionHistory({ gameState }) {
   const { auctions, players, currentUser } = gameState;
   const reversedAuctionHistory = [...auctions]
     .reverse()
