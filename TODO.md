@@ -17,7 +17,7 @@
 - [ ] scoring
   - [ ] bonus for least-spending player, even if tied for least-spending
   - [ ] tie-breaker goes to least-spending tied player
-  - [ ] starting industries
+  - [x] starting industries
 - [ ] 4-5 player reveal zero bids
 - [ ] 5 player peeks
 

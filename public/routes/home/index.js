@@ -260,6 +260,8 @@ function Game({ gameState = {}, setGameState }) {
     turn,
   } = gameState;
 
+  const currentPlayer = players.find((player) => player.id === currentUser);
+
   useCurrentGameState(setGameState, hash);
 
   const handleQuit = useCallback(async () => {
@@ -332,6 +334,10 @@ function Game({ gameState = {}, setGameState }) {
   return html`<div className="game">
     <div className="status-bar">
       <h1>QE</h1>
+      <span className="player-info">
+        ${renderFlag(currentPlayer.country, true)}
+        ${renderSector(currentPlayer.sector)}
+      </span>
       <span className="status-message">${status}</span>
       <span className="animate-flicker">🕑</span>
     </div>
@@ -490,6 +496,9 @@ function renderFlag(country, isOpaque = false) {
       countryCode = "cn";
       break;
   }
+  if (!countryCode) {
+    return null;
+  }
   return html`<span
     className="flag-icon flag-icon-squared flag-icon-${countryCode} ${isOpaque
       ? "flag-icon-opaque"
@@ -515,6 +524,9 @@ function renderSector(sector) {
     case "MAN":
       sectorCode = "manufacturing";
       break;
+  }
+  if (!sectorCode) {
+    return null;
   }
   return html`<span
     className="flag-icon sector-icon icon-${sectorCode}"
