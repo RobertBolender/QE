@@ -351,45 +351,28 @@ function Game({ gameState = {}, setGameState }) {
           ${renderSector(currentAuction.sector)}
           ${renderValue(currentAuction.value)}
         </div>
-        <table className="auction-details">
-          <tr>
-            <td>Auctioneer:</td>
-            <td>
-              <span className="auctioneer-flag"
-                >${renderFlag(players[turn].country)}</span
-              >
-            </td>
-          </tr>
-          <tr>
-            <td>
-              Starting bid:
-            </td>
-            <td>
-              ${currentAuction[players[turn].id]}
-            </td>
-          </tr>
-        </table>
+        <div className="auction-details">
+          ${renderBids(gameState)}
+          <div>Starting bid: ${currentAuction[players[turn].id]}</div>
+          <input
+            type="number"
+            min=${isStartingBid ? "1" : "0"}
+            step="1"
+            required
+            onChange=${handleSetBid}
+            ref=${bidRef}
+          />
+          <button type="submit">Bid</button>
+        </div>
       </div>`}
-      <input
-        type="number"
-        min=${isStartingBid ? "1" : "0"}
-        step="1"
-        required
-        onChange=${handleSetBid}
-        ref=${bidRef}
-      />
-      <button type="submit">Bid</button>
     </form>`}
-    ${round !== 0 &&
-    html`
-      <div className="auction-history">${renderAuctionHistory(gameState)}</div>
-    `}
+    ${round !== 0 && renderAuctionHistory(gameState)}
     <details className="game-details">
       <summary>Game Details: (${name})</summary>
       <ul className="game-players">
         ${players.map(
           (player) =>
-            html`<li>${renderFlag(player.country)} ${player.player}</li>`
+            html`<li>${renderFlag(player.country, true)} ${player.player}</li>`
         )}
       </ul>
       <p>Start time: ${startTime}</p>
@@ -401,38 +384,77 @@ function Game({ gameState = {}, setGameState }) {
   </div>`;
 }
 
+function renderBids(gameState) {
+  const { auctions, players, turn } = gameState;
+  const currentAuction = auctions[auctions.length - 1];
+  const playersInTurnOrder = [...players, ...players].slice(
+    turn,
+    turn + players.length
+  );
+  return html`
+    <div className="bids-row">
+      ${playersInTurnOrder.map((player) =>
+        renderFlag(
+          player.country,
+          typeof currentAuction[player.id] !== "undefined"
+        )
+      )}
+    </div>
+  `;
+}
+
 function renderAuctionHistory(gameState) {
   const { auctions, players, currentUser } = gameState;
   function getPlayerCountry(playerId) {
     return players.find((player) => player.id === playerId)?.country;
   }
+  const reversedAuctionHistory = [...auctions]
+    .reverse()
+    .filter((auction) => typeof auction[currentUser] !== "undefined");
+
+  if (!reversedAuctionHistory.length) {
+    return null;
+  }
+
   return html`
-    <table>
-      <tr>
-        <th>Company</th>
-        ${players.map((player) => html`<th>${player.country}</th>`)}
-        <th>Winner</th>
-      </tr>
-      ${auctions.map(
-        (auction) => html`
-          <tr>
-            <td>
-              ${renderFlag(auction.country)}${renderSector(
-                auction.sector
-              )}${renderValue(auction.value)}
-            </td>
-            ${players.map((player) => html`<td>${auction[player.id]}</td>`)}
-            <td>
-              ${auction.winner && renderFlag(getPlayerCountry(auction.winner))}
-            </td>
-          </tr>
-        `
-      )}
-    </table>
+    <div className="auction-history">
+      <table>
+        <tr>
+          <th>Company</th>
+          ${players.map((player) => html`<th>${player.country}</th>`)}
+        </tr>
+        ${reversedAuctionHistory.map(
+          (auction) => html`
+            <tr>
+              <td>
+                ${renderFlag(auction.country, true)}${renderSector(
+                  auction.sector
+                )}${renderValue(auction.value)}
+              </td>
+              ${players.map(
+                (player) =>
+                  html`<td
+                    className="${auction.winner === player.id
+                      ? "auction-winner"
+                      : ""}"
+                  >
+                    ${auction[player.id]}
+                    ${auction.startingPlayer === player.id && "*"}
+                  </td>`
+              )}
+            </tr>
+          `
+        )}
+        <caption>
+          <span>* Starting Bid</span>
+          <span className="bg-green">Winning Bid</span>
+        </caption>
+      </table>
+    </div>
   `;
 }
 
-function renderFlag(country) {
+function renderFlag(country, isOpaque = false) {
   let countryCode = "";
   switch (country) {
     case "US":
@@ -452,7 +474,9 @@ function renderFlag(country) {
       break;
   }
   return html`<span
-    className="flag-icon flag-icon-squared flag-icon-${countryCode}"
+    className="flag-icon flag-icon-squared flag-icon-${countryCode} ${isOpaque
+      ? "flag-icon-opaque"
+      : "flag-icon-transparent"}"
   ></span>`;
 }
 

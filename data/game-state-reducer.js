@@ -89,6 +89,9 @@ function reduce(state, action) {
 
       // Record this bid
       newAuctions[newAuctions.length - 1][action.userId] = action.bid;
+      if (action.userId === startingPlayer.id) {
+        newAuctions[newAuctions.length - 1].startingPlayer = startingPlayer.id;
+      }
 
       const isLastBidOfRound = priorBidsThisRound === state.players.length - 1;
       const isFinalRound = state.privateData.upcomingAuctions.length === 0;
