@@ -299,6 +299,8 @@ function Game({ gameState = {}, setGameState }) {
     setGameState(data);
   }, [gameState]);
 
+  const [viewKind, setViewKind] = useState("history");
+
   const currentAuction = auctions[auctions.length - 1];
   const hasBid =
     currentUser &&
@@ -363,7 +365,26 @@ function Game({ gameState = {}, setGameState }) {
         </div>
       </div>`}
     </form>`}
-    ${round !== 0 && renderAuctionHistory(gameState)}
+    ${round !== 0 &&
+    html`<div className="radio-set">
+      <input
+        id="history"
+        type="radio"
+        name="viewKind"
+        checked=${viewKind === "history"}
+        onChange=${() => setViewKind("history")}
+      />
+      <label for="history">Auctions</label>
+      <input
+        id="scores"
+        type="radio"
+        name="viewKind"
+        checked=${viewKind === "scores"}
+        onChange=${() => setViewKind("scores")}
+      />
+      <label for="scores">Scoreboard</label>
+    </div>`}
+    ${round !== 0 && viewKind === "history" && renderAuctionHistory(gameState)}
     <details className="game-details">
       <summary>Game Details: (${name})</summary>
       <ul className="game-players">
@@ -402,15 +423,14 @@ function renderBids(gameState) {
 
 function renderAuctionHistory(gameState) {
   const { auctions, players, currentUser } = gameState;
-  function getPlayerCountry(playerId) {
-    return players.find((player) => player.id === playerId)?.country;
-  }
   const reversedAuctionHistory = [...auctions]
     .reverse()
     .filter((auction) => typeof auction[currentUser] !== "undefined");
 
   if (!reversedAuctionHistory.length) {
-    return null;
+    return html`<div className="auction-history text-center">
+      Waiting for first auction results
+    </div>`;
   }
 
   return html`

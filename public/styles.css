@@ -281,6 +281,10 @@ button:active {
   color: white;
 }
 
+.text-center {
+  text-align: center;
+}
+
 .game-details > summary {
   padding: 8px;
 }
