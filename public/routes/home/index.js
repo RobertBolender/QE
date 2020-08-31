@@ -445,6 +445,12 @@ function Scoreboard({ gameState }) {
     currentPlayerIndex,
     currentPlayerIndex + players.length
   );
+  const playerForViewCountry = players.find(
+    (player) => player.country === viewCountry
+  );
+  const auctionsForViewCountry = auctions.filter(
+    (auction) => auction.winner === playerForViewCountry.id
+  );
   return html`
     <div className="scoreboard">
       <div className="radio-set">
@@ -463,6 +469,9 @@ function Scoreboard({ gameState }) {
               )}</label
             >`
         )}
+      </div>
+      <div className="score-details">
+        Auctions won: ${auctionsForViewCountry.length}
       </div>
     </div>
   `;
