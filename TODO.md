@@ -25,6 +25,7 @@
   - [ ] move starting industries to private data
 - [ ] 4-5 player reveal zero bids
 - [ ] 5 player peeks
+- [ ] Show error message when bid === starting bid
 
 ## Wishlist
 
