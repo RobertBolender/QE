@@ -187,9 +187,9 @@ function NewGame({ setGameState }) {
 
   return html`<div>
     <h1>QE: Create a Game</h1>
-    <div>
-      <button onClick=${handleQuickstart}>Quickstart</button>
-    </div>
+    <button className="quickstart" onClick=${handleQuickstart}>
+      Play a Tutorial Game
+    </button>
     <form method="POST" action="/games" onSubmit=${handleSubmit}>
       <label for="name">Game name</label>
       <input

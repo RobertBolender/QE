@@ -7,6 +7,11 @@ p {
   margin: 0;
 }
 
+.quickstart {
+  display: block;
+  margin-bottom: 12px;
+}
+
 form {
   display: inline-grid;
   grid-auto-flow: row;
