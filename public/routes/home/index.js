@@ -357,6 +357,13 @@ function Game({ gameState = {}, setGameState }) {
     }
   };
 
+  const handleFocus = async (event) => {
+    event.preventDefault();
+    if (bidRef.current) {
+      bidRef.current.focus();
+    }
+  };
+
   return html`<div className="game">
     <div className="status-bar">
       <h1>QE</h1>
@@ -378,7 +385,7 @@ function Game({ gameState = {}, setGameState }) {
     html`<form onSubmit=${handleBid} ref=${formRef}>
       ${currentAuction.country &&
       html`<div className="auction-row">
-        <div className="auction-item">
+        <div className="auction-item" onClick=${handleFocus}>
           ${renderFlag(currentAuction.country)}
           ${renderSector(currentAuction.sector)}
           ${renderValue(currentAuction.value)}
