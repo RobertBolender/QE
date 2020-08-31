@@ -310,8 +310,9 @@ function Game({ gameState = {}, setGameState }) {
     typeof currentAuction[currentUser] !== "undefined";
   const startingPlayer = players[turn].id;
   const isStartingBid = startingPlayer === currentUser;
-  const startingBid = currentAuction[startingPlayer];
-  const waitingForStartBid = typeof startingBid === "undefined";
+  const startingBid = currentAuction && currentAuction[startingPlayer];
+  const waitingForStartBid =
+    currentAuction && !isStartingBid && typeof startingBid === "undefined";
 
   const [bid, setBid] = useState();
   const formRef = useRef();
