@@ -119,7 +119,7 @@ function ExistingGames({ games, setGameState }) {
 
   return html`<div>
     <h1>QE: Join a Game</h1>
-    <form onSubmit=${handleSubmit}>
+    <form className="join-or-create-form" onSubmit=${handleSubmit}>
       <label for="game">Pick a Game</label>
       ${games.map(
         (game, index) =>
@@ -190,7 +190,12 @@ function NewGame({ setGameState }) {
     <button className="quickstart" onClick=${handleQuickstart}>
       Play a Tutorial Game
     </button>
-    <form method="POST" action="/games" onSubmit=${handleSubmit}>
+    <form
+      className="join-or-create-form"
+      method="POST"
+      action="/games"
+      onSubmit=${handleSubmit}
+    >
       <label for="name">Game name</label>
       <input
         id="name"

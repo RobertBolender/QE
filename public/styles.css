@@ -16,6 +16,12 @@ input[type="number"] {
   margin-bottom: 12px;
 }
 
+.join-or-create-form {
+  display: grid;
+  grid-auto-flow: row;
+  grid-gap: 12px;
+}
+
 @media (min-width: 400px) {
   form {
     padding: 12px;
