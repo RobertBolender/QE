@@ -11,9 +11,12 @@ form {
   display: inline-grid;
   grid-auto-flow: row;
   grid-gap: 12px;
-  padding: 12px;
-  border: 1px solid #333;
-  border-radius: 6px 6px 0 0;
+}
+
+@media (min-width: 400px) {
+  form {
+    padding: 12px;
+  }
 }
 
 label {
