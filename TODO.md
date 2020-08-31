@@ -10,6 +10,7 @@
 - [x] assign countries to players
 - [x] flag indicators for pending bids
 - [x] company badges
+- [x] focus bid input after bid
 - [x] auction history
   - [x] always show starting bid
   - [ ] move non-public bids to private data

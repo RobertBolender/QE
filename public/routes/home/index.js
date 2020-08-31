@@ -310,13 +310,12 @@ function Game({ gameState = {}, setGameState }) {
     typeof currentAuction[currentUser] !== "undefined";
   const startingPlayer = players[turn].id;
   const isStartingBid = startingPlayer === currentUser;
-  const waitingForStartBid =
-    !isStartingBid &&
-    currentAuction &&
-    typeof currentAuction[startingPlayer] === "undefined";
+  const startingBid = currentAuction[startingPlayer];
+  const waitingForStartBid = typeof startingBid === "undefined";
 
   const [bid, setBid] = useState();
   const formRef = useRef();
+  const bidRef = useRef();
   const handleSetBid = (event) => setBid(event.target.value);
   const handleBid = async (event) => {
     event.preventDefault();
@@ -328,6 +327,9 @@ function Game({ gameState = {}, setGameState }) {
     setGameState(data);
     if (formRef.current) {
       formRef.current.reset();
+      if (bidRef.current) {
+        bidRef.current.focus();
+      }
     }
   };
 
@@ -359,13 +361,13 @@ function Game({ gameState = {}, setGameState }) {
         </div>
         <div className="auction-details">
           ${renderBids(gameState)}
-          <div>Starting bid: ${currentAuction[players[turn].id]}</div>
           <input
             type="number"
             min=${isStartingBid ? "1" : "0"}
             step="1"
             required
             onChange=${handleSetBid}
+            ref=${bidRef}
           />
           <button type="submit">Bid</button>
         </div>
