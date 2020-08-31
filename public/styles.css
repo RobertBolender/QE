@@ -145,7 +145,7 @@ button:active {
 
 .auction-row {
   display: grid;
-  grid-template-columns: min-content auto;
+  grid-template-columns: min-content 150px;
   grid-gap: 12px;
 }
 
