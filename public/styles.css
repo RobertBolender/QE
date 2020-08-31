@@ -159,7 +159,7 @@ button:active {
   display: grid;
   grid-auto-rows: min-content;
   align-items: flex-start;
-  grid-gap: 12px;
+  grid-gap: 8px;
 }
 
 .auction-details input {
