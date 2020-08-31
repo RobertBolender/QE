@@ -189,6 +189,29 @@ button:active {
   height: 25px;
 }
 
+.previous-auction {
+  display: grid;
+  grid-gap: 8px;
+  padding: 8px;
+  border: 1px solid black;
+  border-radius: 3px;
+}
+
+.previous-auction > div {
+  display: grid;
+  grid-auto-flow: column;
+  grid-gap: 8px;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.previous-auction .flag-icon {
+  width: 25px !important;
+  height: 25px;
+  border-radius: 50%;
+  border: 1px solid black;
+}
+
 .auction-item {
   display: grid;
   height: 180px;

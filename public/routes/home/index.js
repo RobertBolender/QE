@@ -309,6 +309,11 @@ function Game({ gameState = {}, setGameState }) {
   const [viewKind, setViewKind] = useState("history");
 
   const currentAuction = auctions[auctions.length - 1];
+  const previousAuction = auctions.length > 1 && auctions[auctions.length - 2];
+  const previousWinner =
+    previousAuction &&
+    previousAuction.winner &&
+    players.find((player) => player.id === previousAuction.winner);
   const hasBid =
     currentUser &&
     currentAuction &&
@@ -336,6 +341,19 @@ function Game({ gameState = {}, setGameState }) {
       if (bidRef.current) {
         bidRef.current.focus();
       }
+    }
+  };
+
+  const handlePeek = async (event) => {
+    event.preventDefault();
+    const data = await postJson(`/game/${id}/peek`);
+    if (data.errorMessage) {
+      console.error(data.errorMessage);
+      return;
+    }
+    setGameState(data);
+    if (bidRef.current) {
+      bidRef.current.focus();
     }
   };
 
@@ -376,6 +394,19 @@ function Game({ gameState = {}, setGameState }) {
             ref=${bidRef}
           />
           <button type="submit">Bid</button>
+          ${previousAuction &&
+          previousWinner &&
+          html`
+            <div className="previous-auction">
+              <div>Previous Auction</div>
+              <div>
+                ${renderFlag(previousWinner.country, true)}
+                ${previousAuction[previousAuction.winner] === "bid"
+                  ? previousAuction[previousAuction.winner]
+                  : html`<button onClick=${handlePeek}>Peek</button>`}
+              </div>
+            </div>
+          `}
         </div>
       </div>`}
     </form>`}
