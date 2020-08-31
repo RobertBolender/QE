@@ -24,8 +24,10 @@
   - [x] starting industries
   - [ ] move starting industries to private data
 - [ ] 4-5 player reveal zero bids
+- [ ] show last auction results in bid area
 - [ ] 5 player peeks
 - [ ] Show error message when bid === starting bid
+- [ ] filter auction history by country, by sector, by winner
 
 ## Wishlist
 
