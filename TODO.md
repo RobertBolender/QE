@@ -15,7 +15,8 @@
   - [x] always show starting bid
   - [ ] move non-public bids to private data
   - [ ] show 'bid' for unknown bids
-  - [ ] show rebids for ties
+  - [x] show rebids for ties
+  - [ ] highlight tied bids
 - [ ] scoring
   - [x] add scoreboard for current player
   - [x] add scoreboards for other players
@@ -28,11 +29,13 @@
   - [ ] bonus for least-spending player, even if tied for least-spending
   - [ ] tie-breaker goes to least-spending tied player
   - [ ] move starting industries to private data
+  - [ ] show potential point gain current auction
 - [ ] 4-5 player reveal zero bids
 - [ ] show last auction results in bid area
 - [ ] 5 player peeks
 - [ ] Show error message when bid === starting bid
 - [ ] filter auction history by country, by sector, by winner
+- [x] figure out crash when bid === starting bid, random bot bids
 
 ## Wishlist
 
