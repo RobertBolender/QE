@@ -533,6 +533,31 @@ function Scoreboard({ gameState }) {
   const naturalizationTotal =
     naturalizationScoresByPlayerCount[players.length][naturalizationCountries];
 
+  const auctionsBySector = [
+    { sector: playerForViewCountry.sector },
+    ...auctionsForViewCountry,
+  ].reduce((result, auction) => {
+    if (!result[auction.sector]) {
+      result[auction.sector] = 0;
+    }
+    result[auction.sector]++;
+    return result;
+  }, {});
+  const monopolizationScoresByPlayerCount = {
+    3: [0, 0, 3, 6, 10],
+    4: [0, 0, 3, 6, 10],
+    5: [0, 0, 6, 10, 16],
+  };
+  const sectors = ["AGR", "FIN", "GOV", "HOU", "MAN"];
+  const monopolizationTotal = sectors.reduce(
+    (total, sector) =>
+      total +
+      monopolizationScoresByPlayerCount[players.length][
+        auctionsBySector[sector] ?? 0
+      ],
+    0
+  );
+
   return html`
     <div className="scoreboard">
       <div className="radio-set">
@@ -562,6 +587,10 @@ function Scoreboard({ gameState }) {
             <td>Auctions Won</td>
             <td>${auctionsForViewCountry.length}</td>
           </tr>
+          <tr>
+            <td>Private Sector</td>
+            <td>${renderSector(playerForViewCountry.sector)}</td>
+          </tr>
           <tr className="border-top">
             <td>Company Values</td>
             <td>${totalValue}</td>
@@ -573,6 +602,10 @@ function Scoreboard({ gameState }) {
           <tr>
             <td>Naturalization</td>
             <td>${naturalizationTotal}</td>
+          </tr>
+          <tr>
+            <td>Monopolization</td>
+            <td>${monopolizationTotal}</td>
           </tr>
         </table>
       </div>
