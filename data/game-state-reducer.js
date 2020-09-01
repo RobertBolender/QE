@@ -255,10 +255,19 @@ function reduce(state, action) {
       }
 
       thisAuction = botState.auctions[botState.auctions.length - 1];
+      const thisStartingBid = thisAuction[thisAuction.startingPlayer];
       bots.forEach((bot) => {
         if (!thisAuction[bot.id]) {
           // Bid for each non-starting bot who hasn't bid yet
-          botState = reduce(botState, { type: "BID", userId: bot.id, bid: 0 });
+          let randomBid = Math.ceil(Math.random() * 10);
+          if (randomBid === thisStartingBid) {
+            randomBid++;
+          }
+          botState = reduce(botState, {
+            type: "BID",
+            userId: bot.id,
+            bid: randomBid,
+          });
         }
       });
 
