@@ -343,6 +343,25 @@ button:active {
   border: 1px solid black;
 }
 
+.score-details table {
+  display: grid;
+  grid-auto-rows: auto;
+}
+
+.score-details tr {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr min-content;
+}
+
+.score-details td {
+  padding: 4px;
+}
+
+.border-top {
+  border-top: 1px solid black;
+}
+
 .bg-green {
   background-color: #48bb78;
   color: white;

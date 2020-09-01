@@ -495,6 +495,33 @@ function Scoreboard({ gameState }) {
   const auctionsForViewCountry = auctions.filter(
     (auction) => auction.winner === playerForViewCountry.id
   );
+  const totalSpend = auctionsForViewCountry.reduce(
+    (total, auction) => total + auction[playerForViewCountry.id],
+    0
+  );
+  const totalValue = auctionsForViewCountry.reduce(
+    (total, auction) => total + auction.value,
+    0
+  );
+
+  const auctionsByRound = auctions.reduce(
+    (result, auction) => {
+      result[auction.round].push(auction);
+      return result;
+    },
+    [[], [], [], [], []]
+  );
+  const pointsForZeros =
+    players.length === 3
+      ? 0
+      : auctionsByRound.reduce(
+          (total, round) =>
+            round.some((auction) => auction[playerForViewCountry.id] === 0)
+              ? total + 2
+              : total,
+          0
+        );
+
   return html`
     <div className="scoreboard">
       <div className="radio-set">
@@ -515,7 +542,24 @@ function Scoreboard({ gameState }) {
         )}
       </div>
       <div className="score-details">
-        Auctions won: ${auctionsForViewCountry.length}
+        <table>
+          <tr>
+            <td>Total Spend</td>
+            <td>$${totalSpend}</td>
+          </tr>
+          <tr>
+            <td>Auctions Won</td>
+            <td>${auctionsForViewCountry.length}</td>
+          </tr>
+          <tr className="border-top">
+            <td>Company Values</td>
+            <td>${totalValue}</td>
+          </tr>
+          <tr>
+            <td>Zero Bids</td>
+            <td>${pointsForZeros}</td>
+          </tr>
+        </table>
       </div>
     </div>
   `;
