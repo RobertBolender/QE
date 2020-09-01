@@ -20,10 +20,10 @@
   - [x] add scoreboard for current player
   - [x] add scoreboards for other players
   - [x] starting industries
-  - [ ] total value of purchased companies
-  - [ ] points for zero bids (4-5 player)
-  - [ ] naturalization
-  - [ ] monopolization
+  - [x] total value of purchased companies
+  - [x] points for zero bids (4-5 player)
+  - [x] naturalization
+  - [x] monopolization
   - [ ] diversification
   - [ ] bonus for least-spending player, even if tied for least-spending
   - [ ] tie-breaker goes to least-spending tied player
