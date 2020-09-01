@@ -559,6 +559,34 @@ function Scoreboard({ gameState }) {
       ],
     0
   );
+  const diversificationSets = auctionsForViewCountry.reduce(
+    (result, auction) => {
+      for (var i = 0, found = false; !found; i++) {
+        if (!result[i]) {
+          result[i] = new Set([auction.country]);
+          found = true;
+          return result;
+        }
+        if (!result[i].has(auction.country)) {
+          result[i].add(auction.country);
+          found = true;
+          return result;
+        }
+      }
+      return result;
+    },
+    []
+  );
+  const diversificationScoresByPlayerCount = {
+    3: [0, 0, 0, 6, 10],
+    4: [0, 0, 0, 6, 10],
+    5: [0, 0, 10, 15, 21],
+  };
+  const diversificationTotal = diversificationSets.reduce(
+    (result, set) =>
+      (result += diversificationScoresByPlayerCount[players.length][set.size]),
+    0
+  );
 
   return html`
     <div className="scoreboard">
@@ -608,6 +636,10 @@ function Scoreboard({ gameState }) {
           <tr>
             <td>Monopolization</td>
             <td>${monopolizationTotal}</td>
+          </tr>
+          <tr>
+            <td>Diversification</td>
+            <td>${diversificationTotal}</td>
           </tr>
         </table>
       </div>
