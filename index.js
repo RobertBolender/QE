@@ -23,11 +23,8 @@ function createBot() {
 }
 
 // Game state
-let testGame = createNewGame("testGameId", "Test Game", createBot());
-testGame = reduce(testGame, { type: "JOIN", player: createBot() });
-testGame = reduce(testGame, { type: "JOIN", player: createBot() });
 const activeGames = new Map();
-const pendingGames = new Map([["testGameId", testGame]]);
+const pendingGames = new Map();
 const activePlayers = new Map();
 
 /**
