@@ -522,6 +522,17 @@ function Scoreboard({ gameState }) {
           0
         );
 
+  const naturalizationCountries = auctionsForViewCountry.filter(
+    (auction) => auction.country === viewCountry
+  ).length;
+  const naturalizationScoresByPlayerCount = {
+    3: [0, 1, 3, 6, 10],
+    4: [0, 1, 3, 6, 10],
+    5: [0, 3, 6, 10],
+  };
+  const naturalizationTotal =
+    naturalizationScoresByPlayerCount[players.length][naturalizationCountries];
+
   return html`
     <div className="scoreboard">
       <div className="radio-set">
@@ -558,6 +569,10 @@ function Scoreboard({ gameState }) {
           <tr>
             <td>Zero Bids</td>
             <td>${pointsForZeros}</td>
+          </tr>
+          <tr>
+            <td>Naturalization</td>
+            <td>${naturalizationTotal}</td>
           </tr>
         </table>
       </div>
