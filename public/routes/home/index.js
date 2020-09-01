@@ -319,7 +319,7 @@ function Game({ gameState = {}, setGameState }) {
     currentAuction &&
     typeof currentAuction[currentUser] !== "undefined";
   const startingPlayer = players[turn].id;
-  const isStartingBid = startingPlayer === currentUser;
+  const isStartingBid = startingPlayer === currentUser && !hasBid;
   const startingBid = currentAuction && currentAuction[startingPlayer];
   const waitingForStartBid =
     currentAuction && !isStartingBid && typeof startingBid === "undefined";
@@ -506,7 +506,9 @@ function Scoreboard({ gameState }) {
 
   const auctionsByRound = auctions.reduce(
     (result, auction) => {
-      result[auction.round].push(auction);
+      if (typeof auction.round !== "undefined") {
+        result[auction.round].push(auction);
+      }
       return result;
     },
     [[], [], [], [], []]
