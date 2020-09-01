@@ -60,7 +60,7 @@ function reduce(state, action) {
       let startingState = {
         ...state,
         players: shuffledPlayers,
-        status: `Waiting for ${shuffledPlayers[0].player} to set a starting bid`,
+        status: `Starting bid: ${shuffledPlayers[0].player}`,
         round: 1,
         turn: 0,
         startTime: new Date().toISOString(),
@@ -122,6 +122,7 @@ function reduce(state, action) {
 
       let nextTurn = state.turn;
       let newStatus = state.status;
+      let nextRound = state.round;
 
       if (
         isLastBidOfRound &&
@@ -181,16 +182,22 @@ function reduce(state, action) {
       if (isLastBidOfRound && isThreePlayerGame && isPenultimateAuction) {
         newStatus = `Final round`;
         nextTurn = "final";
+        nextRound = "final";
       }
 
       if (isLastBidOfRound && !(isThreePlayerGame && isPenultimateAuction)) {
         nextTurn = (state.turn + 1) % state.players.length;
-        newStatus = `Waiting for ${state.players[nextTurn].player} to make a starting bid.`;
+        newStatus = `Starting bid: ${state.players[nextTurn].player}`;
+        if (nextTurn === 0) {
+          nextRound++;
+        }
       }
 
       if (priorBidsThisRound === 0) {
         newStatus = `Starting bid: ${action.bid}`;
       }
+
+      newAuctions[newAuctions.length - 1].round = nextRound;
 
       let bidState = {
         ...state,
@@ -201,6 +208,7 @@ function reduce(state, action) {
           upcomingAuctions: newUpcomingAuctions,
         },
         turn: nextTurn,
+        round: nextRound,
       };
 
       if (action.userId.substring(0, 4) !== "bot-") {
