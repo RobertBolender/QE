@@ -14,14 +14,19 @@
 - [x] auction history
   - [x] always show starting bid
   - [ ] move non-public bids to private data
-  - [ ] show rebids for ties
   - [ ] show 'bid' for unknown bids
+  - [ ] show rebids for ties
 - [ ] scoring
-  - [ ] add scoreboard for current player
-  - [ ] add scoreboards for other players
+  - [x] add scoreboard for current player
+  - [x] add scoreboards for other players
+  - [x] starting industries
+  - [ ] total value of purchased companies
+  - [ ] points for zero bids (4-5 player)
+  - [ ] naturalization
+  - [ ] monopolization
+  - [ ] diversification
   - [ ] bonus for least-spending player, even if tied for least-spending
   - [ ] tie-breaker goes to least-spending tied player
-  - [x] starting industries
   - [ ] move starting industries to private data
 - [ ] 4-5 player reveal zero bids
 - [ ] show last auction results in bid area
