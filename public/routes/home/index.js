@@ -546,9 +546,9 @@ function Scoreboard({ gameState }) {
     return result;
   }, {});
   const monopolizationScoresByPlayerCount = {
-    3: [0, 0, 3, 6, 10],
-    4: [0, 0, 3, 6, 10],
-    5: [0, 0, 6, 10, 16],
+    3: [0, 0, 3, 6, 10, 10],
+    4: [0, 0, 3, 6, 10, 10],
+    5: [0, 0, 6, 10, 16, 16],
   };
   const sectors = ["AGR", "FIN", "GOV", "HOU", "MAN"];
   const monopolizationTotal = sectors.reduce(
