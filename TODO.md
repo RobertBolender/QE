@@ -15,6 +15,7 @@
   - [x] always show starting bid
   - [ ] move non-public bids to private data
   - [ ] show 'bid' for unknown bids
+  - [ ] show > player bid for unknown winning bids
   - [ ] 4-5 player reveal zero bids
   - [x] show rebids for ties
   - [ ] highlight tied bids
@@ -32,12 +33,15 @@
   - [ ] move starting industries to private data
   - [ ] show potential point gain current auction
   - [ ] show point totals at top of scoreboard
-- [ ] show last auction results in bid area
+- [ ] show last auction results in bid area for auctioneer
 - [ ] 5 player peeks
 - [ ] Show error message when bid === starting bid
 - [ ] filter auction history by country, by sector, by winner
 - [x] figure out crash when bid === starting bid, random bot bids
+- [ ] allow players to leave the table when the game is over
+- [ ] delete the game when the last player leaves
 
 ## Wishlist
 
 - [ ] React Flip Move for turn order
+- [ ] Websockets
