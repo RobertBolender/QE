@@ -265,7 +265,7 @@ function Game({ gameState = {}, setGameState }) {
     turn,
   } = gameState;
 
-  const currentPlayer = players.find((player) => player.id === currentUser);
+  const currentPlayer = getCurrentPlayer(gameState);
 
   useCurrentGameState(setGameState, hash);
 
@@ -460,15 +460,12 @@ function Game({ gameState = {}, setGameState }) {
 }
 
 function renderBids(gameState) {
-  const { auctions, players, turn } = gameState;
+  const { auctions } = gameState;
   const currentAuction = auctions[auctions.length - 1];
-  const playersInTurnOrder = [...players, ...players].slice(
-    turn,
-    turn + players.length
-  );
+  const players = getPlayersInTurnOrder(gameState);
   return html`
     <div className="bids-row">
-      ${playersInTurnOrder.map((player) =>
+      ${players.map((player) =>
         renderFlag(
           player.country,
           typeof currentAuction[player.id] !== "undefined"
@@ -478,17 +475,30 @@ function renderBids(gameState) {
   `;
 }
 
+function getCurrentPlayer({ players, currentUser }) {
+  return players.find((player) => player.id === currentUser);
+}
+
+function getPlayersInOrder({ players }, getIndex) {
+  const index = players.findIndex(getIndex);
+  return [...players, ...players].slice(index, index + players.length);
+}
+
+function getPlayersInTurnOrder(gameState) {
+  return getPlayersInOrder(gameState, (_, i) => i === gameState.turn);
+}
+
+function getPlayersWithCurrentUserFirst(gameState) {
+  return getPlayersInOrder(gameState, (p) => p.id === gameState.currentUser);
+}
+
 function Scoreboard({ gameState }) {
-  const { auctions, players, currentUser } = gameState;
-  const currentPlayerIndex = players.findIndex(
-    (player) => player.id === currentUser
-  );
-  const currentPlayer = players[currentPlayerIndex];
+  const { auctions } = gameState;
+
+  const currentPlayer = getCurrentPlayer(gameState);
   const [viewCountry, setViewCountry] = useState(currentPlayer.country);
-  const playersWithCurrentPlayerFirst = [...players, ...players].slice(
-    currentPlayerIndex,
-    currentPlayerIndex + players.length
-  );
+  const playersStartingWithCurrent = getPlayersWithCurrentUserFirst(gameState);
+
   const playerForViewCountry = players.find(
     (player) => player.country === viewCountry
   );
@@ -591,7 +601,7 @@ function Scoreboard({ gameState }) {
   return html`
     <div className="scoreboard">
       <div className="radio-set">
-        ${playersWithCurrentPlayerFirst.map(
+        ${playersStartingWithCurrent.map(
           (player) => html`<input
               id="scoreboard-${player.country}"
               type="radio"
