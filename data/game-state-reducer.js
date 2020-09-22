@@ -62,7 +62,7 @@ function reduce(state, action) {
       let startingState = {
         ...state,
         players: shuffledPlayers,
-        peeks: [],
+        peeks: {},
         status: `Starting bid: ${shuffledPlayers[0].player}`,
         round: 1,
         turn: 0,
@@ -236,6 +236,26 @@ function reduce(state, action) {
       }
 
       return bidState;
+    case "PEEK":
+      if (state.players.length !== 5) {
+        return {
+          errorMessage: "You can't peek in a game with fewer than 5 players.",
+        };
+      }
+      if (typeof state.peeks[action.userId] !== "undefined") {
+        return {
+          errorMessage: "You already peeked this game!",
+        };
+      }
+      const newPeeks = {
+        ...state.peeks,
+      };
+      const previousAuctionIndex = state.privateData.auctions.length - 2;
+      newPeeks[action.userId] = previousAuctionIndex;
+      return {
+        ...state,
+        peeks: newPeeks,
+      };
     case "BOT":
       const bots = state.players.filter((x) => x.id.substring(0, 4) === "bot-");
       if (!bots.length) {

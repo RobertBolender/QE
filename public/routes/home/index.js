@@ -261,6 +261,7 @@ function Game({ gameState = {}, setGameState }) {
     auctions,
     players,
     status,
+    peeks,
     round,
     turn,
   } = gameState;
@@ -409,7 +410,9 @@ function Game({ gameState = {}, setGameState }) {
               <div>
                 ${renderFlag(previousWinner.country, true)}
                 ${previousAuction[previousAuction.winner]}
-                ${previousAuction[previousAuction.winner] &&
+                ${players.length === 5 &&
+                typeof peeks[currentUser] === "undefined" &&
+                previousAuction[previousAuction.winner] &&
                 previousAuction[previousAuction.winner]
                   .toString()
                   .startsWith(">") &&

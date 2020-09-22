@@ -252,6 +252,7 @@ app.post("/game/quickstart", (req, res) => {
   newGame = reduce(newGame, { type: "JOIN", player: createBot() });
   newGame = reduce(newGame, { type: "JOIN", player: createBot() });
   newGame = reduce(newGame, { type: "JOIN", player: createBot() });
+  newGame = reduce(newGame, { type: "JOIN", player: createBot() });
   newGame = reduce(newGame, { type: "START", shuffle: true, tutorial: true });
 
   activeGames.set(gameId, newGame);
@@ -281,6 +282,28 @@ app.post("/game/:id/bid", (req, res) => {
 
   const bid = sanitizeNumericInput(req.body.bid);
   const newState = reduce(game, { type: "BID", userId, bid });
+  if (newState.errorMessage) {
+    return res.status(400).send(newState.errorMessage);
+  }
+
+  activeGames.set(gameId, newState);
+  return res.json(getGameState(userId, gameId));
+});
+
+/**
+ * POST /game/:id/peek
+ *
+ * Attempt to peek at the last winning bid
+ */
+app.post("/game/:id/peek", (req, res) => {
+  const gameId = req.params.id;
+  const game = activeGames.get(gameId);
+  if (!game) {
+    return res.status(404).send("Game not found.");
+  }
+
+  const userId = getUserId(req);
+  const newState = reduce(game, { type: "PEEK", userId });
   if (newState.errorMessage) {
     return res.status(400).send(newState.errorMessage);
   }
