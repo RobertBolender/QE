@@ -408,9 +408,12 @@ function Game({ gameState = {}, setGameState }) {
               <div>Previous Auction</div>
               <div>
                 ${renderFlag(previousWinner.country, true)}
-                ${previousAuction[previousAuction.winner] === "bid"
-                  ? previousAuction[previousAuction.winner]
-                  : html`<button onClick=${handlePeek}>Peek</button>`}
+                ${previousAuction[previousAuction.winner]}
+                ${previousAuction[previousAuction.winner] &&
+                previousAuction[previousAuction.winner]
+                  .toString()
+                  .startsWith(">") &&
+                html`<button onClick=${handlePeek}>Peek</button>`}
               </div>
             </div>
           `}
