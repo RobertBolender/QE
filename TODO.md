@@ -28,11 +28,11 @@
   - [x] naturalization
   - [x] monopolization
   - [x] diversification
-  - [ ] bonus for least-spending player, even if tied for least-spending
-  - [ ] tie-breaker goes to least-spending tied player
+  - [x] bonus for least-spending player, even if tied for least-spending
+  - [x] tie-breaker goes to least-spending tied player
   - [ ] move starting industries to private data
   - [ ] show potential point gain current auction
-  - [ ] show point totals at top of scoreboard
+  - [x] show point totals at top of scoreboard
 - [ ] show last auction results in bid area for auctioneer
 - [ ] 5 player peeks
 - [ ] Show error message when bid === starting bid
