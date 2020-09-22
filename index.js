@@ -212,7 +212,7 @@ app.post("/game/quickstart", (req, res) => {
   newGame = reduce(newGame, { type: "JOIN", player: createBot() });
   newGame = reduce(newGame, { type: "JOIN", player: createBot() });
   newGame = reduce(newGame, { type: "JOIN", player: createBot() });
-  newGame = reduce(newGame, { type: "START", shuffle: true });
+  newGame = reduce(newGame, { type: "START", shuffle: true, tutorial: true });
 
   activeGames.set(gameId, newGame);
   activePlayers.set(userId, gameId);
