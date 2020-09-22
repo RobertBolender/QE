@@ -96,7 +96,7 @@ function reduce(state, action) {
 
       // Record this bid
       newAuctions[newAuctions.length - 1][action.userId] = action.bid;
-      if (action.userId === startingPlayer.id) {
+      if (startingPlayer && action.userId === startingPlayer.id) {
         newAuctions[newAuctions.length - 1].startingPlayer = startingPlayer.id;
       }
 
@@ -241,7 +241,11 @@ function reduce(state, action) {
       const startingPlayerIsBot =
         Number.isInteger(state.turn) &&
         bots.find((bot) => state.players[state.turn].id === bot.id);
-      if (priorBids === 0 && !startingPlayerIsBot) {
+      if (
+        priorBids === 0 &&
+        !startingPlayerIsBot &&
+        !(state.turn === "final")
+      ) {
         // Waiting for a non-bot player to set a starting bid
         return state;
       }
@@ -257,7 +261,9 @@ function reduce(state, action) {
       }
 
       thisAuction = botState.auctions[botState.auctions.length - 1];
-      const thisStartingBid = thisAuction[thisAuction.startingPlayer];
+      const thisStartingBid = thisAuction.startingPlayer
+        ? thisAuction[thisAuction.startingPlayer]
+        : 0;
       bots.forEach((bot) => {
         if (!thisAuction[bot.id]) {
           // Bid for each non-starting bot who hasn't bid yet
