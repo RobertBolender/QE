@@ -29,9 +29,9 @@
   - [x] monopolization
   - [x] diversification
   - [x] bonus for least-spending player, even if tied for least-spending
+  - [ ] only add least-spending bonus at end of game
   - [x] tie-breaker goes to least-spending tied player
-  - [ ] move starting industries to private data
-  - [ ] show potential point gain current auction
+  - [x] move starting industries to private data
   - [x] show point totals at top of scoreboard
 - [ ] show last auction results in bid area for auctioneer
 - [ ] 5 player peeks
@@ -45,3 +45,4 @@
 
 - [ ] React Flip Move for turn order
 - [ ] Websockets
+- [ ] show potential point gain current auction
