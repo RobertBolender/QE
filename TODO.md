@@ -18,7 +18,6 @@
   - [x] show > player bid for unknown winning bids
   - [x] 4-5 player reveal zero bids
   - [x] show rebids for ties
-  - [ ] highlight tied bids
 - [x] scoring
   - [x] add scoreboard for current player
   - [x] add scoreboards for other players
@@ -35,9 +34,15 @@
   - [x] show point totals at top of scoreboard
 - [x] show last auction results in bid area for auctioneer
 - [x] 5 player peeks
-- [ ] Show error message when bid === starting bid
-- [ ] filter auction history by country, by sector, by winner
 - [x] figure out crash when bid === starting bid, random bot bids
+- [ ] Show winner name in status bar
+- [ ] Show error message when bid === starting bid
+- [ ] Show error messages in status bar
+
+## Next
+
+- [ ] highlight tied bids
+- [ ] filter auction history by country, by sector, by winner
 - [ ] allow players to leave the table when the game is over
 - [ ] delete the game when the last player leaves
 
