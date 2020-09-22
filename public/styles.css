@@ -290,7 +290,8 @@ button:active {
 .auction-history tr {
   display: grid;
   grid-auto-flow: column;
-  grid-template-columns: 108px 1fr 1fr 1fr 1fr;
+  grid-template-columns: 108px;
+  grid-auto-columns: 1fr;
   grid-gap: 4px;
 }
 
