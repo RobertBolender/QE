@@ -65,6 +65,7 @@ function reduce(state, action) {
         turn: 0,
         startTime: new Date().toISOString(),
         auctions: shuffledCompanies.slice(0, 1),
+        tutorial: action.tutorial,
         privateData: {
           upcomingAuctions: shuffledCompanies.slice(1),
         },
@@ -260,7 +261,7 @@ function reduce(state, action) {
       bots.forEach((bot) => {
         if (!thisAuction[bot.id]) {
           // Bid for each non-starting bot who hasn't bid yet
-          let randomBid = Math.ceil(Math.random() * 10);
+          let randomBid = botState.tutorial ? Math.ceil(Math.random() * 10) : 0;
           if (randomBid === thisStartingBid) {
             randomBid++;
           }
