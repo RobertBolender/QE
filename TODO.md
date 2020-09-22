@@ -19,7 +19,7 @@
   - [ ] 4-5 player reveal zero bids
   - [x] show rebids for ties
   - [ ] highlight tied bids
-- [ ] scoring
+- [x] scoring
   - [x] add scoreboard for current player
   - [x] add scoreboards for other players
   - [x] starting industries
@@ -29,7 +29,7 @@
   - [x] monopolization
   - [x] diversification
   - [x] bonus for least-spending player, even if tied for least-spending
-  - [ ] only add least-spending bonus at end of game
+  - [x] only add least-spending bonus at end of game
   - [x] tie-breaker goes to least-spending tied player
   - [x] move starting industries to private data
   - [x] show point totals at top of scoreboard
