@@ -172,6 +172,7 @@ function reduce(state, action) {
           ...state,
           status: newStatus,
           auctions: newAuctions,
+          gameOver: true,
         };
       }
 

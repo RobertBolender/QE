@@ -80,6 +80,11 @@ button:active {
   flex: 1 0 0;
   padding: 12px;
   text-align: center;
+  display: grid;
+  grid-auto-flow: row;
+  justify-content: center;
+  align-items: center;
+  grid-gap: 8px;
 }
 
 .radio-set > input:disabled + label {
@@ -338,7 +343,7 @@ button:active {
   --focus-color: #48bb78;
 }
 
-.scoreboard .radio-set label > span {
+.scoreboard .radio-set label > span:first-child {
   width: 25px !important;
   height: 25px;
   border-radius: 50%;
@@ -492,4 +497,13 @@ button:active {
 
 .icon-government {
   background-position-y: 2px !important;
+}
+
+.highest-spender {
+  color: red;
+  font-weight: bold;
+}
+
+.winner {
+  color: #48bb78;
 }

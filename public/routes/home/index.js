@@ -479,6 +479,10 @@ function getCurrentPlayer({ players, currentUser }) {
   return players.find((player) => player.id === currentUser);
 }
 
+function getPlayerForCountry({ players }, country) {
+  return players.find((player) => player.country === country);
+}
+
 function getPlayersInOrder({ players }, getIndex) {
   const index = players.findIndex(getIndex);
   return [...players, ...players].slice(index, index + players.length);
@@ -492,24 +496,111 @@ function getPlayersWithCurrentUserFirst(gameState) {
   return getPlayersInOrder(gameState, (p) => p.id === gameState.currentUser);
 }
 
-function Scoreboard({ gameState }) {
-  const { auctions } = gameState;
+function getPlayerScores(gameState) {
+  const { players, gameOver } = gameState;
+  const results = players.reduce((result, player) => {
+    result[player.id] = getScoresForPlayer(gameState, player);
+    return result;
+  }, {});
+  const winner = !gameOver
+    ? false
+    : players.reduce((incumbent, contender) => {
+        const contenderResults = results[contender.id];
+        if (contenderResults.highestSpender) {
+          return incumbent;
+        }
 
-  const currentPlayer = getCurrentPlayer(gameState);
-  const [viewCountry, setViewCountry] = useState(currentPlayer.country);
-  const playersStartingWithCurrent = getPlayersWithCurrentUserFirst(gameState);
+        if (!incumbent) {
+          return contender;
+        }
 
-  const playerForViewCountry = players.find(
-    (player) => player.country === viewCountry
+        const incumbentResults = results[incumbent.id];
+        if (contenderResults.totalScore > incumbentResults.totalScore) {
+          return contender;
+        }
+
+        if (
+          contenderResults.totalScore === incumbentResults.totalScore &&
+          contenderResults.totalSpend < incumbentResults.totalSpend
+        ) {
+          return contender;
+        }
+
+        return incumbent;
+      }, false);
+  results.winner = winner;
+  return results;
+}
+
+function getPlayerSpending(gameState) {
+  const { auctions, players } = gameState;
+  const playerSpending = auctions.reduce(
+    (result, auction) => {
+      if (auction.winner) {
+        result[auction.winner] =
+          (result[auction.winner] ?? 0) + auction[auction.winner];
+      }
+      return result;
+    },
+    players.reduce((result, player) => {
+      result[player.id] = 0;
+      return result;
+    }, {})
   );
-  const auctionsForViewCountry = auctions.filter(
-    (auction) => auction.winner === playerForViewCountry.id
+  let lowest = Number.MAX_SAFE_INTEGER;
+  let highest = 0;
+  const spendersBySpending = {};
+  Object.entries(playerSpending).forEach(([playerId, total]) => {
+    if (!spendersBySpending[total]) {
+      spendersBySpending[total] = [];
+    }
+    spendersBySpending[total].push(playerId);
+    if (total > highest) {
+      highest = total;
+    }
+    if (total < lowest) {
+      lowest = total;
+    }
+  });
+
+  const lowestSpenders = spendersBySpending[lowest] ?? [];
+  const highestSpenders = spendersBySpending[highest] ?? [];
+  return {
+    playerSpending,
+    lowestSpenders,
+    highestSpenders,
+  };
+}
+
+function getScoresForPlayer(gameState, player) {
+  const { auctions, players } = gameState;
+
+  const auctionsForPlayer = auctions.filter(
+    (auction) => auction.winner === player.id
   );
-  const totalSpend = auctionsForViewCountry.reduce(
-    (total, auction) => total + auction[playerForViewCountry.id],
+
+  const totalAuctionCount = auctionsForPlayer.length;
+
+  const totalSpend = auctionsForPlayer.reduce(
+    (total, auction) => total + auction[player.id],
     0
   );
-  const totalValue = auctionsForViewCountry.reduce(
+
+  const { playerSpending, lowestSpenders, highestSpenders } = getPlayerSpending(
+    gameState
+  );
+
+  const lowestSpenderBonusByPlayerCount = {
+    3: 6,
+    4: 6,
+    5: 7,
+  };
+
+  const lowestSpenderBonus = lowestSpenders.includes(player.id)
+    ? lowestSpenderBonusByPlayerCount[players.length]
+    : 0;
+
+  const totalValue = auctionsForPlayer.reduce(
     (total, auction) => total + auction.value,
     0
   );
@@ -523,44 +614,47 @@ function Scoreboard({ gameState }) {
     },
     [[], [], [], [], []]
   );
+
   const pointsForZeros =
     players.length === 3
       ? 0
       : auctionsByRound.reduce(
           (total, round) =>
-            round.some((auction) => auction[playerForViewCountry.id] === 0)
+            round.some((auction) => auction[player.id] === 0)
               ? total + 2
               : total,
           0
         );
 
-  const naturalizationCountries = auctionsForViewCountry.filter(
-    (auction) => auction.country === viewCountry
+  const naturalizationCountries = auctionsForPlayer.filter(
+    (auction) => auction.country === player.country
   ).length;
+
   const naturalizationScoresByPlayerCount = {
     3: [0, 1, 3, 6, 10],
     4: [0, 1, 3, 6, 10],
     5: [0, 3, 6, 10],
   };
+
   const naturalizationTotal =
     naturalizationScoresByPlayerCount[players.length][naturalizationCountries];
 
   const auctionsBySector = [
-    { sector: playerForViewCountry.sector },
-    ...auctionsForViewCountry,
+    { sector: player.sector },
+    ...auctionsForPlayer,
   ].reduce((result, auction) => {
-    if (!result[auction.sector]) {
-      result[auction.sector] = 0;
-    }
-    result[auction.sector]++;
+    result[auction.sector] = (result[auction.sector] ?? 0) + 1;
     return result;
   }, {});
+
   const monopolizationScoresByPlayerCount = {
     3: [0, 0, 3, 6, 10, 10],
     4: [0, 0, 3, 6, 10, 10],
     5: [0, 0, 6, 10, 16, 16],
   };
+
   const sectors = ["AGR", "FIN", "GOV", "HOU", "MAN"];
+
   const monopolizationTotal = sectors.reduce(
     (total, sector) =>
       total +
@@ -569,34 +663,81 @@ function Scoreboard({ gameState }) {
       ],
     0
   );
-  const diversificationSets = auctionsForViewCountry.reduce(
-    (result, auction) => {
-      for (var i = 0, found = false; !found; i++) {
-        if (!result[i]) {
-          result[i] = new Set([auction.country]);
-          found = true;
-          return result;
-        }
-        if (!result[i].has(auction.country)) {
-          result[i].add(auction.country);
-          found = true;
-          return result;
-        }
+
+  const diversificationSets = auctionsForPlayer.reduce((result, auction) => {
+    for (var i = 0, found = false; !found; i++) {
+      if (!result[i]) {
+        result[i] = new Set([auction.country]);
+        found = true;
+        return result;
       }
-      return result;
-    },
-    []
-  );
+      if (!result[i].has(auction.country)) {
+        result[i].add(auction.country);
+        found = true;
+        return result;
+      }
+    }
+    return result;
+  }, []);
+
   const diversificationScoresByPlayerCount = {
     3: [0, 0, 0, 6, 10],
     4: [0, 0, 0, 6, 10],
     5: [0, 0, 10, 15, 21],
   };
+
   const diversificationTotal = diversificationSets.reduce(
     (result, set) =>
       (result += diversificationScoresByPlayerCount[players.length][set.size]),
     0
   );
+
+  const highestSpender = highestSpenders.includes(player.id);
+
+  const totalScore =
+    totalValue +
+    pointsForZeros +
+    naturalizationTotal +
+    monopolizationTotal +
+    diversificationTotal +
+    lowestSpenderBonus;
+
+  return {
+    totalAuctionCount,
+    totalSpend,
+    totalValue,
+    pointsForZeros,
+    naturalizationTotal,
+    monopolizationTotal,
+    diversificationTotal,
+    lowestSpenderBonus,
+    highestSpender,
+    totalScore,
+  };
+}
+
+function Scoreboard({ gameState }) {
+  const currentPlayer = getCurrentPlayer(gameState);
+  const [viewCountry, setViewCountry] = useState(currentPlayer.country);
+  const playerForCountry = getPlayerForCountry(gameState, viewCountry);
+  const playersStartingWithCurrent = getPlayersWithCurrentUserFirst(gameState);
+
+  const playerScores = getPlayerScores(gameState);
+
+  const {
+    totalAuctionCount,
+    totalSpend,
+    totalValue,
+    pointsForZeros,
+    naturalizationTotal,
+    monopolizationTotal,
+    diversificationTotal,
+    lowestSpenderBonus,
+    highestSpender,
+    totalScore,
+  } = playerScores[playerForCountry.id];
+
+  const winner = playerScores.winner.id === playerForCountry.id;
 
   return html`
     <div className="scoreboard">
@@ -609,12 +750,18 @@ function Scoreboard({ gameState }) {
               checked=${viewCountry === player.country}
               onChange=${() => setViewCountry(player.country)}
             />
-            <label for="scoreboard-${player.country}"
-              >${renderFlag(
-                player.country,
-                viewCountry === player.country
-              )}</label
-            >`
+            <label for="scoreboard-${player.country}">
+              ${renderFlag(player.country, viewCountry === player.country)}
+              ${playerScores[player.id].highestSpender
+                ? html`<span className="highest-spender"
+                    >$${playerScores[player.id].totalSpend}</span
+                  >`
+                : playerScores.winner.id === player.id
+                ? html`<span className="winner"
+                    >${playerScores[player.id].totalScore}</span
+                  >`
+                : playerScores[player.id].totalScore}
+            </label>`
         )}
       </div>
       <div className="score-details">
@@ -625,11 +772,11 @@ function Scoreboard({ gameState }) {
           </tr>
           <tr>
             <td>Auctions Won</td>
-            <td>${auctionsForViewCountry.length}</td>
+            <td>${totalAuctionCount}</td>
           </tr>
           <tr>
             <td>Private Sector</td>
-            <td>${renderSector(playerForViewCountry.sector)}</td>
+            <td>${renderSector(playerForCountry.sector)}</td>
           </tr>
           <tr className="border-top">
             <td>Company Values</td>
@@ -651,6 +798,28 @@ function Scoreboard({ gameState }) {
             <td>Diversification</td>
             <td>${diversificationTotal}</td>
           </tr>
+          <tr>
+            <td>Lowest Spender Bonus</td>
+            <td>${lowestSpenderBonus}</td>
+          </tr>
+          <tr className="border-top">
+            <td>Total Score</td>
+            <td>${totalScore}</td>
+          </tr>
+          ${highestSpender &&
+          html`
+            <tr>
+              <td>Highest Spender</td>
+              <td><span className="highest-spender">$${totalSpend}</span></td>
+            </tr>
+          `}
+          ${winner &&
+          html`
+            <tr>
+              <td>Winner</td>
+              <td className="winner">$$$</td>
+            </tr>
+          `}
         </table>
       </div>
     </div>
