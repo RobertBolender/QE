@@ -573,7 +573,7 @@ function getPlayerSpending(gameState) {
 }
 
 function getScoresForPlayer(gameState, player) {
-  const { auctions, players } = gameState;
+  const { auctions, players, gameOver } = gameState;
 
   const auctionsForPlayer = auctions.filter(
     (auction) => auction.winner === player.id
@@ -597,9 +597,10 @@ function getScoresForPlayer(gameState, player) {
     5: 7,
   };
 
-  const lowestSpenderBonus = lowestSpenders.includes(player.id)
-    ? lowestSpenderBonusByPlayerCount[players.length]
-    : 0;
+  const lowestSpenderBonus =
+    gameOver && lowestSpenders.includes(player.id)
+      ? lowestSpenderBonusByPlayerCount[players.length]
+      : 0;
 
   const totalValue = auctionsForPlayer.reduce(
     (total, auction) => total + auction.value,
@@ -693,7 +694,7 @@ function getScoresForPlayer(gameState, player) {
     0
   );
 
-  const highestSpender = highestSpenders.includes(player.id);
+  const highestSpender = gameOver && highestSpenders.includes(player.id);
 
   const totalScore =
     totalValue +
