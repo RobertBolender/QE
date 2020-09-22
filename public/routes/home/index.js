@@ -582,7 +582,8 @@ function getScoresForPlayer(gameState, player) {
   const totalAuctionCount = auctionsForPlayer.length;
 
   const totalSpend = auctionsForPlayer.reduce(
-    (total, auction) => total + auction[player.id],
+    (total, auction) =>
+      Number.isInteger(auction[player.id]) ? total + auction[player.id] : total,
     0
   );
 
