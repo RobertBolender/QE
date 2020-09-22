@@ -2,7 +2,7 @@ const { createNewGame, reduce } = require("./game-state-reducer");
 const { createUserId } = require("../util/crypto");
 
 test("Can create, join, and start a game", () => {
-  let game = createNewGame("testGameId", "testGameName", createBot());
+  let game = createNewGame(createTestGameId(), "testGameName", createBot());
   expect(game.players.length).toBe(1);
 
   game = reduce(game, { type: "JOIN", player: createBot() });
@@ -13,7 +13,8 @@ test("Can create, join, and start a game", () => {
 
   expect(game.round).toBe(0);
   game = reduce(game, { type: "START" });
-  expect(game.round).toBe(1);
+  // let the bots play
+  expect(game.gameOver).toBe(true);
 });
 
 test("Can't bid 0 for starting bid", () => {
@@ -21,7 +22,7 @@ test("Can't bid 0 for starting bid", () => {
   const player2 = createTestUser();
   const player3 = createTestUser();
 
-  let game = createNewGame("testGameId", "testGameName", player1);
+  let game = createNewGame(createTestGameId(), "testGameName", player1);
   game = reduce(game, { type: "JOIN", player: player2 });
   game = reduce(game, { type: "JOIN", player: player3 });
   game = reduce(game, { type: "START", shuffle: false });
@@ -35,7 +36,7 @@ test("Can't bid equal to starting bid", () => {
   const player2 = createTestUser();
   const player3 = createTestUser();
 
-  let game = createNewGame("testGameId", "testGameName", player1);
+  let game = createNewGame(createTestGameId(), "testGameName", player1);
   game = reduce(game, { type: "JOIN", player: player2 });
   game = reduce(game, { type: "JOIN", player: player3 });
   game = reduce(game, { type: "START", shuffle: false });
@@ -51,7 +52,7 @@ test("3 player game ends after 16 bids", () => {
   const player2 = createBot();
   const player3 = createBot();
 
-  let game = createNewGame("testGameId", "testGameName", player1);
+  let game = createNewGame(createTestGameId(), "testGameName", player1);
   game = reduce(game, { type: "JOIN", player: player2 });
   game = reduce(game, { type: "JOIN", player: player3 });
 
@@ -103,7 +104,7 @@ test("4 player game ends after 16 bids", () => {
   const player3 = createBot();
   const player4 = createBot();
 
-  let game = createNewGame("testGameId", "testGameName", player1);
+  let game = createNewGame(createTestGameId(), "testGameName", player1);
   game = reduce(game, { type: "JOIN", player: player2 });
   game = reduce(game, { type: "JOIN", player: player3 });
   game = reduce(game, { type: "JOIN", player: player4 });
@@ -157,7 +158,7 @@ test("5 player game ends after 15 bids", () => {
   const player4 = createBot();
   const player5 = createBot();
 
-  let game = createNewGame("testGameId", "testGameName", player1);
+  let game = createNewGame(createTestGameId(), "testGameName", player1);
   game = reduce(game, { type: "JOIN", player: player2 });
   game = reduce(game, { type: "JOIN", player: player3 });
   game = reduce(game, { type: "JOIN", player: player4 });
@@ -209,7 +210,7 @@ test("All bids are re-evaluated after a re-bid", () => {
   const player3 = createTestUser();
   const player4 = createTestUser();
 
-  let game = createNewGame("testGameId", "testGameName", player1);
+  let game = createNewGame(createTestGameId(), "testGameName", player1);
   game = reduce(game, { type: "JOIN", player: player2 });
   game = reduce(game, { type: "JOIN", player: player3 });
   game = reduce(game, { type: "JOIN", player: player4 });
@@ -237,7 +238,7 @@ test("After a 3rd consecutive tie, the highest non-tied bid wins", () => {
   const player2 = createTestUser();
   const player3 = createTestUser();
 
-  let game = createNewGame("testGameId", "testGameName", player1);
+  let game = createNewGame(createTestGameId(), "testGameName", player1);
   game = reduce(game, { type: "JOIN", player: player2 });
   game = reduce(game, { type: "JOIN", player: player3 });
   game = reduce(game, { type: "START", shuffle: false });
@@ -269,7 +270,7 @@ test("Ties are not re-bid in final round of 3-player game", () => {
   const player2 = createTestUser();
   const player3 = createBot();
 
-  let game = createNewGame("testGameId", "testGameName", player1);
+  let game = createNewGame(createTestGameId(), "testGameName", player1);
   game = reduce(game, { type: "JOIN", player: player2 });
   game = reduce(game, { type: "JOIN", player: player3 });
 
@@ -344,4 +345,10 @@ function createBot() {
     id: `bot-${createUserId()}`,
     player: "Computer",
   };
+}
+
+let testGameId = 0;
+function createTestGameId() {
+  testGameId++;
+  return `test-game-${testGameId}`;
 }
