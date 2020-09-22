@@ -63,13 +63,24 @@ function getGameState(userId, gameId) {
           value: auction.value,
           sector: auction.sector,
           winner: auction.winner,
-          [userId]: auction[userId],
+          startingPlayer: auction.startingPlayer,
         };
         gameState.players.forEach((player) => {
-          if (player.id === userId) {
+          if (
+            player.id === userId ||
+            auction.startingPlayer === player.id ||
+            auction.startingPlayer === userId
+          ) {
             visibleData[player.id] = auction[player.id];
+          } else if (
+            gameState.players.length !== 3 &&
+            auction[player.id] === 0
+          ) {
+            visibleData[player.id] = 0;
+          } else if (auction.winner === player.id) {
+            visibleData[player.id] = `> ${auction[userId]}`;
           } else {
-            visibleData[player.id] = auction[player.id] ? "bid" : null;
+            visibleData[player.id] = auction[player.id] ? "?" : null;
           }
         });
         if (gameState.peeks[userId] === index) {
