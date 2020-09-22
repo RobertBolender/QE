@@ -52,9 +52,11 @@ function reduce(state, action) {
       const shuffledCompanies = action.shuffle ? shuffle(companies) : companies;
       const shuffledCountries = action.shuffle ? shuffle(countries) : countries;
       const shuffledSectors = action.shuffle ? shuffle(sectors) : sectors;
+      const playersWithSectors = JSON.parse(JSON.stringify(shuffledPlayers));
       for (var i = 0; i < shuffledPlayers.length; i++) {
         shuffledPlayers[i].country = shuffledCountries[i];
-        shuffledPlayers[i].sector = shuffledSectors[i];
+        playersWithSectors[i].country = shuffledCountries[i];
+        playersWithSectors[i].sector = shuffledSectors[i];
       }
 
       let startingState = {
@@ -69,6 +71,7 @@ function reduce(state, action) {
         privateData: {
           auctions: shuffledCompanies.slice(0, 1),
           upcomingAuctions: shuffledCompanies.slice(1),
+          playersWithSectors,
         },
       };
 

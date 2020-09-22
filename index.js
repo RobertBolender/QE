@@ -78,9 +78,19 @@ function getGameState(userId, gameId) {
         return visibleData;
       });
 
+  const visiblePlayerData = gameState.gameOver
+    ? privateData.playersWithSectors
+    : gameState.players.map((player, index) => {
+        if (player.id === userId) {
+          player.sector = privateData.playersWithSectors[index].sector;
+        }
+        return player;
+      });
+
   const visibleGameState = {
     ...gameState,
     auctions: visibleAuctionData,
+    players: visiblePlayerData,
   };
 
   return { ...visibleGameState, hash: hash(visibleGameState) };
