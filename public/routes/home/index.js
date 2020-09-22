@@ -688,7 +688,7 @@ function getScoresForPlayer(gameState, player) {
   const diversificationScoresByPlayerCount = {
     3: [0, 0, 0, 6, 10],
     4: [0, 0, 0, 6, 10],
-    5: [0, 0, 10, 15, 21],
+    5: [0, 0, 10, 15, 21, 21],
   };
 
   const diversificationTotal = diversificationSets.reduce(
