@@ -60,13 +60,14 @@ function reduce(state, action) {
       let startingState = {
         ...state,
         players: shuffledPlayers,
+        peeks: [],
         status: `Starting bid: ${shuffledPlayers[0].player}`,
         round: 1,
         turn: 0,
         startTime: new Date().toISOString(),
-        auctions: shuffledCompanies.slice(0, 1),
         tutorial: action.tutorial,
         privateData: {
+          auctions: shuffledCompanies.slice(0, 1),
           upcomingAuctions: shuffledCompanies.slice(1),
         },
       };
@@ -84,14 +85,16 @@ function reduce(state, action) {
       const startingPlayer = state.players[state.turn];
       const startingBid =
         startingPlayer &&
-        state.auctions[state.auctions.length - 1][startingPlayer.id];
+        state.privateData.auctions[state.privateData.auctions.length - 1][
+          startingPlayer.id
+        ];
       if (action.bid === startingBid) {
         return {
           errorMessage: "You can't bid equal to starting bid.",
         };
       }
 
-      const newAuctions = [...state.auctions];
+      const newAuctions = [...state.privateData.auctions];
       const newUpcomingAuctions = [...state.privateData.upcomingAuctions];
 
       // Record this bid
@@ -144,7 +147,10 @@ function reduce(state, action) {
         const rebidState = {
           ...state,
           status: newStatus,
-          auctions: newAuctions,
+          privateData: {
+            ...state.privateData,
+            auctions: newAuctions,
+          },
         };
         return reduce(rebidState, { type: "BOT" });
       }
@@ -172,7 +178,10 @@ function reduce(state, action) {
         return {
           ...state,
           status: newStatus,
-          auctions: newAuctions,
+          privateData: {
+            ...state.privateData,
+            auctions: newAuctions,
+          },
           gameOver: true,
         };
       }
@@ -204,9 +213,9 @@ function reduce(state, action) {
       let bidState = {
         ...state,
         status: newStatus,
-        auctions: newAuctions,
         privateData: {
           ...state.privateData,
+          auctions: newAuctions,
           upcomingAuctions: newUpcomingAuctions,
         },
         turn: nextTurn,
@@ -231,7 +240,8 @@ function reduce(state, action) {
         return state;
       }
 
-      let thisAuction = state.auctions[state.auctions.length - 1];
+      let thisAuction =
+        state.privateData.auctions[state.privateData.auctions.length - 1];
       if (bots.every((bot) => typeof thisAuction[bot.id] !== "undefined")) {
         // All bots have already bid in this round
         return state;
@@ -260,7 +270,8 @@ function reduce(state, action) {
         });
       }
 
-      thisAuction = botState.auctions[botState.auctions.length - 1];
+      thisAuction =
+        botState.privateData.auctions[botState.privateData.auctions.length - 1];
       const thisStartingBid = thisAuction.startingPlayer
         ? thisAuction[thisAuction.startingPlayer]
         : 0;
@@ -286,7 +297,8 @@ function reduce(state, action) {
 
 function getNumberOfBidsInCurrentAuction(gameState) {
   return gameState.players.reduce((total, player) => {
-    const currentAuction = gameState.auctions[gameState.auctions.length - 1];
+    const currentAuction =
+      gameState.privateData.auctions[gameState.privateData.auctions.length - 1];
     if (typeof currentAuction[player.id] !== "undefined") {
       return total + 1;
     }

@@ -55,7 +55,35 @@ function getGameState(userId, gameId) {
    * }
    */
 
-  return { ...gameState, hash: hash(gameState) };
+  const visibleAuctionData = gameState.gameOver
+    ? privateData.auctions
+    : privateData.auctions.map((auction, index) => {
+        const visibleData = {
+          country: auction.country,
+          value: auction.value,
+          sector: auction.sector,
+          winner: auction.winner,
+          [userId]: auction[userId],
+        };
+        gameState.players.forEach((player) => {
+          if (player.id === userId) {
+            visibleData[player.id] = auction[player.id];
+          } else {
+            visibleData[player.id] = auction[player.id] ? "bid" : null;
+          }
+        });
+        if (gameState.peeks[userId] === index) {
+          visibleData[auction.winner] = auction[auction.winner];
+        }
+        return visibleData;
+      });
+
+  const visibleGameState = {
+    ...gameState,
+    auctions: visibleAuctionData,
+  };
+
+  return { ...visibleGameState, hash: hash(visibleGameState) };
 }
 
 /**
@@ -232,7 +260,8 @@ app.post("/game/:id/bid", (req, res) => {
     return res.status(404).send("Game not found.");
   }
 
-  const currentAuction = game.auctions[game.auctions.length - 1];
+  const currentAuction =
+    game.privateData.auctions[game.privateData.auctions.length - 1];
   const userId = getUserId(req);
   if (currentAuction[userId]) {
     return res.status(400).send("You already bid this round.");

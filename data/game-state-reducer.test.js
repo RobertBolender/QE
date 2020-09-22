@@ -42,7 +42,7 @@ test("Can't bid equal to starting bid", () => {
   game = reduce(game, { type: "START", shuffle: false });
 
   game = reduce(game, { type: "BID", userId: player1.id, bid: 5 });
-  expect(game.auctions[0][player1.id]).toBe(5);
+  expect(game.privateData.auctions[0][player1.id]).toBe(5);
   game = reduce(game, { type: "BID", userId: player2.id, bid: 5 });
   expect(game.errorMessage).toBeDefined();
 });
@@ -56,10 +56,9 @@ test("3 player game ends after 16 bids", () => {
   game = reduce(game, { type: "JOIN", player: player2 });
   game = reduce(game, { type: "JOIN", player: player3 });
 
-  expect(game.auctions).toHaveLength(0);
   expect(game.privateData).toBeUndefined();
   game = reduce(game, { type: "START", shuffle: false });
-  expect(game.auctions).toHaveLength(1);
+  expect(game.privateData.auctions).toHaveLength(1);
   expect(game.privateData.upcomingAuctions).toHaveLength(15);
 
   expect(game.turn).toBe(0);
@@ -109,10 +108,9 @@ test("4 player game ends after 16 bids", () => {
   game = reduce(game, { type: "JOIN", player: player3 });
   game = reduce(game, { type: "JOIN", player: player4 });
 
-  expect(game.auctions).toHaveLength(0);
   expect(game.privateData).toBeUndefined();
   game = reduce(game, { type: "START", shuffle: false });
-  expect(game.auctions).toHaveLength(1);
+  expect(game.privateData.auctions).toHaveLength(1);
   expect(game.privateData.upcomingAuctions).toHaveLength(15);
 
   expect(game.turn).toBe(0);
@@ -164,10 +162,9 @@ test("5 player game ends after 15 bids", () => {
   game = reduce(game, { type: "JOIN", player: player4 });
   game = reduce(game, { type: "JOIN", player: player5 });
 
-  expect(game.auctions).toHaveLength(0);
   expect(game.privateData).toBeUndefined();
   game = reduce(game, { type: "START", shuffle: false });
-  expect(game.auctions).toHaveLength(1);
+  expect(game.privateData.auctions).toHaveLength(1);
   expect(game.privateData.upcomingAuctions).toHaveLength(14);
 
   expect(game.turn).toBe(0);
@@ -228,9 +225,9 @@ test("All bids are re-evaluated after a re-bid", () => {
   game = reduce(game, { type: "BID", userId: player3.id, bid: 6 });
   game = reduce(game, { type: "BID", userId: player4.id, bid: 3 });
   expect(game.turn).toBe(1);
-  expect(game.auctions[0].winner).toBeUndefined();
-  expect(game.auctions[1].winner).toBeUndefined();
-  expect(game.auctions[2].winner).toBe(player3.id);
+  expect(game.privateData.auctions[0].winner).toBeUndefined();
+  expect(game.privateData.auctions[1].winner).toBeUndefined();
+  expect(game.privateData.auctions[2].winner).toBe(player3.id);
 });
 
 test("After a 3rd consecutive tie, the highest non-tied bid wins", () => {
@@ -248,21 +245,21 @@ test("After a 3rd consecutive tie, the highest non-tied bid wins", () => {
   game = reduce(game, { type: "BID", userId: player2.id, bid: 5 });
   game = reduce(game, { type: "BID", userId: player3.id, bid: 5 });
   expect(game.turn).toBe(0);
-  expect(game.auctions.length).toBe(2);
+  expect(game.privateData.auctions.length).toBe(2);
   game = reduce(game, { type: "BID", userId: player2.id, bid: 5 });
   game = reduce(game, { type: "BID", userId: player3.id, bid: 5 });
   expect(game.turn).toBe(0);
-  expect(game.auctions.length).toBe(3);
+  expect(game.privateData.auctions.length).toBe(3);
   game = reduce(game, { type: "BID", userId: player2.id, bid: 5 });
   game = reduce(game, { type: "BID", userId: player3.id, bid: 5 });
   expect(game.turn).toBe(1);
-  expect(game.auctions.length).toBe(4);
-  expect(game.auctions[0].rebid).toBeUndefined();
-  expect(game.auctions[0].winner).toBeUndefined();
-  expect(game.auctions[1].rebid).toBe(1);
-  expect(game.auctions[1].winner).toBeUndefined();
-  expect(game.auctions[2].rebid).toBe(2);
-  expect(game.auctions[2].winner).toBe(player1.id);
+  expect(game.privateData.auctions.length).toBe(4);
+  expect(game.privateData.auctions[0].rebid).toBeUndefined();
+  expect(game.privateData.auctions[0].winner).toBeUndefined();
+  expect(game.privateData.auctions[1].rebid).toBe(1);
+  expect(game.privateData.auctions[1].winner).toBeUndefined();
+  expect(game.privateData.auctions[2].rebid).toBe(2);
+  expect(game.privateData.auctions[2].winner).toBe(player1.id);
 });
 
 test("Ties are not re-bid in final round of 3-player game", () => {
@@ -274,10 +271,9 @@ test("Ties are not re-bid in final round of 3-player game", () => {
   game = reduce(game, { type: "JOIN", player: player2 });
   game = reduce(game, { type: "JOIN", player: player3 });
 
-  expect(game.auctions).toHaveLength(0);
   expect(game.privateData).toBeUndefined();
   game = reduce(game, { type: "START", shuffle: false });
-  expect(game.auctions).toHaveLength(1);
+  expect(game.privateData.auctions).toHaveLength(1);
   expect(game.privateData.upcomingAuctions).toHaveLength(15);
 
   expect(game.turn).toBe(0);
@@ -329,7 +325,8 @@ test("Ties are not re-bid in final round of 3-player game", () => {
   game = reduce(game, { type: "BID", userId: player1.id, bid: 5 });
   game = reduce(game, { type: "BID", userId: player2.id, bid: 5 });
 
-  expect(game.auctions[game.auctions.length - 1].winner).toBeUndefined;
+  expect(game.privateData.auctions[game.privateData.auctions.length - 1].winner)
+    .toBeUndefined;
   expect(game.status).toBe("Game over!");
 });
 
