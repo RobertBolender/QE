@@ -9,7 +9,7 @@
     "start:server": "node index.js",
     "start:app": "npx servor public/ --browse --reload",
     "watch:server": "nodemon index.js --ignore public/",
-    "deploy": "scp -rq ./ robert@robertbolender.com:/var/www/qe.robertbolender.com/",
+    "deploy": "scp -rq data/ index.js public/ util/ robert@robertbolender.com:/var/www/qe.robertbolender.com/",
     "deploy:styles": "scp -rq ./public/styles.css robert@robertbolender.com:/var/www/qe.robertbolender.com/public/",
     "deploy:app": "scp -rq ./public/routes/ robert@robertbolender.com:/var/www/qe.robertbolender.com/public/"
   },
