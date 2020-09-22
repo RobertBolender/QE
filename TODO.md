@@ -13,8 +13,8 @@
 - [x] focus bid input after bid
 - [x] auction history
   - [x] always show starting bid
-  - [ ] move non-public bids to private data
-  - [ ] show 'bid' for unknown bids
+  - [x] move non-public bids to private data
+  - [x] show 'bid' for unknown bids
   - [ ] show > player bid for unknown winning bids
   - [ ] 4-5 player reveal zero bids
   - [x] show rebids for ties
