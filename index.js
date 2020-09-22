@@ -46,15 +46,6 @@ function getGameState(userId, gameId) {
   const { privateData, ...gameState } = game;
   gameState.currentUser = userId;
 
-  /**
-   * TODO: return game state as should be seen by the current user
-   * game.publicInfo
-   *  peeks, auctions, winners
-   * game.privateInfo {
-   *  userId: { bids, advantage }
-   * }
-   */
-
   const visibleAuctionData = gameState.gameOver
     ? privateData.auctions
     : privateData.auctions.map((auction, index) => {
