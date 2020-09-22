@@ -34,7 +34,7 @@
   - [x] move starting industries to private data
   - [x] show point totals at top of scoreboard
 - [x] show last auction results in bid area for auctioneer
-- [ ] 5 player peeks
+- [x] 5 player peeks
 - [ ] Show error message when bid === starting bid
 - [ ] filter auction history by country, by sector, by winner
 - [x] figure out crash when bid === starting bid, random bot bids
