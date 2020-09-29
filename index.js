@@ -11,6 +11,7 @@ const hash = require("object-hash");
 const { createGameId, createUserId } = require("./util/crypto");
 const { sanitizeNumericInput, sanitizeStringInput } = require("./util/input");
 const { sessionHandler, getUserId } = require("./util/session-handler");
+const { getPlayerScores } = require("./util/scores");
 app.use(sessionHandler);
 
 // Game data
@@ -95,7 +96,11 @@ function getGameState(userId, gameId) {
     players: visiblePlayerData,
   };
 
-  return { ...visibleGameState, hash: hash(visibleGameState) };
+  return {
+    ...visibleGameState,
+    playerScores: getPlayerScores(visibleGameState),
+    hash: hash(visibleGameState),
+  };
 }
 
 /**
