@@ -36,8 +36,8 @@
 - [x] 5 player peeks
 - [x] figure out crash when bid === starting bid, random bot bids
 - [ ] Show winner name in status bar
-- [ ] Show error message when bid === starting bid
-- [ ] Show error messages in status bar
+- [x] Show error message when bid === starting bid
+- [x] Show error messages in status bar
 
 ## Next
 
