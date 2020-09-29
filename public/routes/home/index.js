@@ -580,7 +580,7 @@ function Scoreboard({ gameState }) {
   const playerForCountry = getPlayerForCountry(gameState, viewCountry);
   const playersStartingWithCurrent = getPlayersWithCurrentUserFirst(gameState);
 
-  const { playerScores } = gameState;
+  const { playerScores, gameOver } = gameState;
 
   const {
     totalAuctionCount,
@@ -610,7 +610,8 @@ function Scoreboard({ gameState }) {
             />
             <label for="scoreboard-${player.country}">
               ${renderFlag(player.country, viewCountry === player.country)}
-              ${playerScores[player.id].highestSpender
+              ${gameOver &&
+              (playerScores[player.id].highestSpender
                 ? html`<span className="highest-spender"
                     >$${playerScores[player.id].totalSpend}</span
                   >`
@@ -618,24 +619,25 @@ function Scoreboard({ gameState }) {
                 ? html`<span className="winner"
                     >${playerScores[player.id].totalScore}</span
                   >`
-                : playerScores[player.id].totalScore}
+                : playerScores[player.id].totalScore)}
             </label>`
         )}
       </div>
       <div className="score-details">
         <table>
           <tr>
-            <td>Total Spend</td>
+            <td>${gameOver ? "Total" : "Known"} Spending</td>
             <td>$${totalSpend}</td>
           </tr>
           <tr>
             <td>Auctions Won</td>
             <td>${totalAuctionCount}</td>
           </tr>
-          <tr>
+          ${playerForCountry.sector &&
+          html`<tr>
             <td>Private Sector</td>
             <td>${renderSector(playerForCountry.sector)}</td>
-          </tr>
+          </tr>`}
           <tr className="border-top">
             <td>Company Values</td>
             <td>${totalValue}</td>
