@@ -35,12 +35,13 @@
 - [x] show last auction results in bid area for auctioneer
 - [x] 5 player peeks
 - [x] figure out crash when bid === starting bid, random bot bids
-- [ ] Show winner name in status bar
+- [x] Show winner name in status bar
 - [x] Show error message when bid === starting bid
 - [x] Show error messages in status bar
 
 ## Next
 
+- [ ] show known spending totals somewhere
 - [ ] highlight tied bids
 - [ ] filter auction history by country, by sector, by winner
 - [ ] allow players to leave the table when the game is over
