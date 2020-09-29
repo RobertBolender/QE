@@ -324,12 +324,17 @@ button:active {
 .auction-history tr {
   display: grid;
   grid-auto-flow: column;
-  grid-template-columns: 108px;
+  grid-template-columns: 36px 108px;
   grid-auto-columns: 1fr;
   grid-gap: 4px;
 }
 
-.auction-history tr > :first-child {
+.auction-history tr > :nth-child(1) {
+  text-align: left;
+  width: 40px;
+}
+
+.auction-history tr > :nth-child(2) {
   text-align: left;
   white-space: nowrap;
 }

@@ -697,8 +697,23 @@ function Scoreboard({ gameState }) {
 function AuctionHistory({ gameState }) {
   const { auctions, players, currentUser } = gameState;
   const reversedAuctionHistory = [...auctions]
+    .map((element, index) => ({ ...element, index }))
     .reverse()
     .filter((auction) => typeof auction[currentUser] !== "undefined");
+
+  const [sort, setSort] = useState("time");
+  const handleToggleSort = useCallback(() => {
+    setSort((previousSort) => {
+      switch (previousSort) {
+        case "time":
+          return "country";
+        case "country":
+          return "money";
+        case "money":
+          return "time";
+      }
+    });
+  }, []);
 
   if (!reversedAuctionHistory.length) {
     return html`<div className="auction-history text-center">
@@ -706,16 +721,75 @@ function AuctionHistory({ gameState }) {
     </div>`;
   }
 
+  const filteredHistory =
+    sort === "time"
+      ? reversedAuctionHistory
+      : reversedAuctionHistory.filter((auction) => !!auction.winner);
+
+  function sortByTime(a, b) {
+    return b.index - a.index;
+  }
+
+  function getKnownAmount(amount) {
+    if (Number.isInteger(amount)) {
+      return amount;
+    }
+    return parseInt(amount.replace("> ", ""));
+  }
+
+  function sortByMoney(a, b) {
+    return getKnownAmount(b[b.winner]) - getKnownAmount(a[a.winner]);
+  }
+
+  function sortByCountry(a, b) {
+    const aPlayer = players.find((player) => player.id === a.winner);
+    const bPlayer = players.find((player) => player.id === b.winner);
+    return aPlayer.country.localeCompare(bPlayer.country);
+  }
+
+  let sortSymbol = "❓";
+  let sortFunction = () => {
+    throw new Error("unspecified sort function");
+  };
+  let sortTitle = "Unknown sorting";
+
+  switch (sort) {
+    case "time":
+      sortSymbol = "🕑";
+      sortFunction = sortByTime;
+      sortTitle = "Sorted by most recent auction, descending.";
+      break;
+    case "country":
+      sortSymbol = "🎌";
+      sortFunction = sortByCountry;
+      sortTitle = "Sorted by winning country.";
+      break;
+    case "money":
+      sortSymbol = "💰";
+      sortFunction = sortByMoney;
+      sortTitle = "Sorted by winning bid amount, descending";
+      break;
+  }
+
+  const sortedHistory = filteredHistory.sort(sortFunction);
+
   return html`
     <div className="auction-history">
       <table>
         <tr>
+          <th onClick=${handleToggleSort} title=${sortTitle}>↕${sortSymbol}</th>
           <th>Company</th>
           ${players.map((player) => html`<th>${player.country}</th>`)}
         </tr>
-        ${reversedAuctionHistory.map(
+        ${sortedHistory.map(
           (auction) => html`
             <tr title=${getAuctionTitle(auction, players)}>
+              <td>
+                ${renderFlag(
+                  players.find((player) => player.id === auction.winner)
+                    ?.country
+                )}
+              </td>
               <td>
                 ${renderFlag(auction.country, true)}${renderSector(
                   auction.sector
