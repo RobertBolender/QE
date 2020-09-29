@@ -41,7 +41,7 @@
 
 ## 2.0
 
-- [ ] show number of active players
+- [x] show number of active players
 - [ ] show known spending totals somewhere
 - [ ] highlight tied bids
 - [ ] filter auction history by country, by sector, by winner

@@ -345,6 +345,15 @@ app.post("/game/:id/flip", (req, res) => {
 });
 
 /**
+ * GET /players
+ *
+ * Get a count of active players.
+ */
+app.get("/players", (req, res) => {
+  return res.json(activePlayers.size);
+});
+
+/**
  * GET /games
  *
  * Get a list of games with links to each game.
