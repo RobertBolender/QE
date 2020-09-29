@@ -601,7 +601,7 @@ function Scoreboard({ gameState }) {
     lowestSpenderBonus,
     highestSpender,
     totalScore,
-  } = playerScores[playerForCountry.id];
+  } = playerScores?.[playerForCountry.id] ?? {};
 
   const winner = playerScores.winner.id === playerForCountry.id;
 
