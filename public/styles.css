@@ -330,8 +330,11 @@ button:active {
   grid-gap: 4px;
 }
 
-.auction-history tr > :nth-child(1) {
+.auction-history tr > th:nth-child(1) {
   cursor: pointer;
+}
+
+.auction-history tr > :nth-child(1) {
   text-align: left;
   width: 40px;
   display: grid;
