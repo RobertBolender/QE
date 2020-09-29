@@ -1,7 +1,9 @@
 import {
   React,
   useCallback,
+  useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "https://unpkg.com/es-react";
@@ -24,7 +26,9 @@ export default function App() {
     return html`<${JoinOrCreateGame} setGameState=${setGameState} />`;
   }
 
-  return html`<${Game} gameState=${gameState} setGameState=${setGameState} />`;
+  return html`<${AlertManager}>
+    <${Game} gameState=${gameState} setGameState=${setGameState}
+  /><//>`;
 }
 
 function JoinOrCreateGame({ setGameState }) {
@@ -251,6 +255,51 @@ function useCurrentGameState(setGameState, initialGameStateHash) {
   }, [lastSeenHash, setGameState]);
 }
 
+const AlertContext = React.createContext();
+
+function AlertManager({ children }) {
+  const [messages, setMessages] = useState([]);
+  const timerRef = useRef();
+  const handleAddMessage = useCallback((message) => {
+    setMessages((previousMessages) => [...previousMessages, message]);
+    function PopMessage() {
+      setMessages((previousMessages) => {
+        if (previousMessages.length > 1) {
+          timerRef.current = setTimeout(PopMessage, 3000);
+          return previousMessages.slice(1);
+        }
+        return [];
+      });
+    }
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = setTimeout(PopMessage, 3000);
+  }, []);
+  const handleClearMessages = useCallback(() => {
+    setMessages([]);
+  }, []);
+  const context = useMemo(
+    () => ({
+      handleAddMessage,
+      handleClearMessages,
+      messages,
+    }),
+    [handleAddMessage, messages]
+  );
+  return html`<${AlertContext.Provider} value=${context}>${children}<//>`;
+}
+
+function AlertBar() {
+  const { messages } = useContext(AlertContext) ?? {};
+  if (!messages.length) {
+    return null;
+  }
+  return html`<div className="alert-bar" key=${messages.length}>
+    ${messages[0]}
+  </div>`;
+}
+
 function Game({ gameState = {}, setGameState }) {
   const {
     hash,
@@ -266,6 +315,8 @@ function Game({ gameState = {}, setGameState }) {
     turn,
   } = gameState;
 
+  const { handleAddMessage, handleClearMessages } = useContext(AlertContext);
+
   const currentPlayer = getCurrentPlayer(gameState);
 
   useCurrentGameState(setGameState, hash);
@@ -277,9 +328,11 @@ function Game({ gameState = {}, setGameState }) {
     const data = await postJson(`/game/${id}/quit`);
     if (data.errorMessage) {
       console.error(data.errorMessage);
+      handleAddMessage(data.errorMessage);
       return;
     }
     setGameState(data);
+    handleClearMessages();
   }, [gameState]);
   const handleStart = useCallback(async () => {
     if (!id) {
@@ -288,9 +341,11 @@ function Game({ gameState = {}, setGameState }) {
     const data = await postJson(`/game/${id}/start`);
     if (data.errorMessage) {
       console.error(data.errorMessage);
+      handleAddMessage(data.errorMessage);
       return;
     }
     setGameState(data);
+    handleClearMessages();
   }, [gameState]);
   const handleFlip = useCallback(async () => {
     if (
@@ -302,9 +357,11 @@ function Game({ gameState = {}, setGameState }) {
     const data = await postJson(`/game/${id}/flip`);
     if (data.errorMessage) {
       console.error(data.errorMessage);
+      handleAddMessage(data.errorMessage);
       return;
     }
     setGameState(data);
+    handleClearMessages();
   }, [gameState]);
 
   const [viewKind, setViewKind] = useState("history");
@@ -334,9 +391,17 @@ function Game({ gameState = {}, setGameState }) {
     const data = await postJson(`/game/${id}/bid`, { bid });
     if (data.errorMessage) {
       console.error(data.errorMessage);
+      handleAddMessage(data.errorMessage);
+      if (formRef.current) {
+        formRef.current.reset();
+        if (bidRef.current) {
+          bidRef.current.focus();
+        }
+      }
       return;
     }
     setGameState(data);
+    handleClearMessages();
     if (formRef.current) {
       formRef.current.reset();
       if (bidRef.current) {
@@ -350,9 +415,11 @@ function Game({ gameState = {}, setGameState }) {
     const data = await postJson(`/game/${id}/peek`);
     if (data.errorMessage) {
       console.error(data.errorMessage);
+      handleAddMessage(data.errorMessage);
       return;
     }
     setGameState(data);
+    handleClearMessages();
     if (bidRef.current) {
       bidRef.current.focus();
     }
@@ -366,6 +433,7 @@ function Game({ gameState = {}, setGameState }) {
   };
 
   return html`<div className="game">
+    <${AlertBar} />
     <div className="status-bar">
       <h1>QE</h1>
       <span className="player-info">

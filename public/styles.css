@@ -127,13 +127,47 @@ button:active {
   margin: auto;
 }
 
+@keyframes alert {
+  0% {
+    width: 100%;
+  }
+  100% {
+    width: 0%;
+  }
+}
+
+.alert-bar,
 .status-bar {
   padding: 6px;
   font-size: 16px;
   line-height: 1;
-  border-bottom: 2px solid green;
   display: grid;
   align-items: center;
+}
+
+.alert-bar {
+  position: absolute;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 39px;
+  background: white;
+}
+
+.alert-bar:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 5px;
+  width: 100%;
+  background: red;
+  animation: alert 3s linear;
+}
+
+.status-bar {
+  border-bottom: 2px solid green;
   grid-template-columns: min-content min-content auto min-content;
   grid-gap: 12px;
 }
