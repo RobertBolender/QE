@@ -157,6 +157,9 @@ function getScoresForPlayer(gameState, player) {
     { sector: player.sector },
     ...auctionsForPlayer,
   ].reduce((result, auction) => {
+    if (!auction.sector) {
+      return result;
+    }
     if (!result[auction.sector]) {
       result[auction.sector] = 1;
     } else {
@@ -182,15 +185,21 @@ function getScoresForPlayer(gameState, player) {
     0
   );
 
-  const diversificationSets = auctionsForPlayer.reduce((result, auction) => {
+  const diversificationSets = [
+    { sector: player.sector },
+    ...auctionsForPlayer,
+  ].reduce((result, auction) => {
+    if (!auction.sector) {
+      return result;
+    }
     for (var i = 0, found = false; !found; i++) {
       if (!result[i]) {
-        result[i] = new Set([auction.country]);
+        result[i] = new Set([auction.sector]);
         found = true;
         return result;
       }
-      if (!result[i].has(auction.country)) {
-        result[i].add(auction.country);
+      if (!result[i].has(auction.sector)) {
+        result[i].add(auction.sector);
         found = true;
         return result;
       }
@@ -199,9 +208,9 @@ function getScoresForPlayer(gameState, player) {
   }, []);
 
   const diversificationScoresByPlayerCount = {
-    3: [0, 0, 0, 6, 10],
-    4: [0, 0, 0, 6, 10],
-    5: [0, 0, 10, 15, 21, 21],
+    3: [0, 0, 0, 4, 8],
+    4: [0, 0, 0, 4, 8],
+    5: [0, 0, 0, 8, 12, 17],
   };
 
   const diversificationTotal = diversificationSets.reduce(
