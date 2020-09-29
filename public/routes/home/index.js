@@ -603,7 +603,7 @@ function Scoreboard({ gameState }) {
     totalScore,
   } = playerScores?.[playerForCountry.id] ?? {};
 
-  const winner = playerScores.winner.id === playerForCountry.id;
+  const winner = playerScores?.winner.id === playerForCountry.id;
 
   return html`
     <div className="scoreboard">
