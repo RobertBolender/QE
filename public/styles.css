@@ -332,6 +332,9 @@ button:active {
 .auction-history tr > :nth-child(1) {
   text-align: left;
   width: 40px;
+  display: grid;
+  place-items: center;
+  color: #bbb;
 }
 
 .auction-history tr > :nth-child(2) {

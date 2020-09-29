@@ -789,6 +789,7 @@ function AuctionHistory({ gameState }) {
                   players.find((player) => player.id === auction.winner)
                     ?.country
                 )}
+                ${!auction.winner && "⋈"}
               </td>
               <td>
                 ${renderFlag(auction.country, true)}${renderSector(
