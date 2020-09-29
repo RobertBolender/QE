@@ -39,8 +39,9 @@
 - [x] Show error message when bid === starting bid
 - [x] Show error messages in status bar
 
-## Next
+## 2.0
 
+- [ ] show number of active players
 - [ ] show known spending totals somewhere
 - [ ] highlight tied bids
 - [ ] filter auction history by country, by sector, by winner
