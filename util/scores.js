@@ -91,11 +91,13 @@ function getScoresForPlayer(gameState, player) {
 
   const totalAuctionCount = auctionsForPlayer.length;
 
-  const totalSpend = auctionsForPlayer.reduce(
-    (total, auction) =>
-      Number.isInteger(auction[player.id]) ? total + auction[player.id] : total,
-    0
-  );
+  const totalSpend = auctionsForPlayer.reduce((total, auction) => {
+    if (Number.isInteger(auction[player.id])) {
+      return total + auction[player.id];
+    } else {
+      return total + parseInt(auction[player.id].replace("> ", ""));
+    }
+  }, 0);
 
   const { playerSpending, lowestSpenders, highestSpenders } = getPlayerSpending(
     gameState
