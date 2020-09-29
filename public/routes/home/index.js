@@ -438,9 +438,12 @@ function Game({ gameState = {}, setGameState }) {
     <${AlertBar} />
     <div className="status-bar">
       <h1>QE</h1>
-      <span className="player-info">
-        ${renderFlag(currentPlayer.country, true)}
-        ${renderSector(currentPlayer.sector)}
+      <span
+        className="player-info"
+        title="This is your country and private sector advantage"
+      >
+        ${renderFlag(currentPlayer.country, true, true)}
+        ${renderSector(currentPlayer.sector, true)}
       </span>
       <span className="status-message"
         >${!gameOver ? status : `${playerScores.winner.player} wins!`}</span
@@ -488,7 +491,12 @@ function Game({ gameState = {}, setGameState }) {
                 previousAuction[previousAuction.winner]
                   .toString()
                   .startsWith(">") &&
-                html`<button onClick=${handlePeek}>Peek</button>`}
+                html`<button
+                  onClick=${handlePeek}
+                  title="Only one use per game, use it wisely!"
+                >
+                  Peek
+                </button>`}
               </div>
             </div>
           `}
@@ -707,7 +715,7 @@ function AuctionHistory({ gameState }) {
         </tr>
         ${reversedAuctionHistory.map(
           (auction) => html`
-            <tr>
+            <tr title=${getAuctionTitle(auction, players)}>
               <td>
                 ${renderFlag(auction.country, true)}${renderSector(
                   auction.sector
@@ -736,7 +744,19 @@ function AuctionHistory({ gameState }) {
   `;
 }
 
-function renderFlag(country, isOpaque = false) {
+function getAuctionTitle(auction, players) {
+  if (!auction.winner) {
+    return "This auction was a tie";
+  }
+
+  const winner = players.find((player) => player.id === auction.winner);
+
+  return `${winner.country} spent ${auction[auction.winner]} for [${
+    auction.country
+  } ${auction.sector} ${auction.value}]`;
+}
+
+function renderFlag(country, isOpaque = false, suppressTitle = false) {
   let countryCode = "";
   switch (country) {
     case "US":
@@ -759,13 +779,14 @@ function renderFlag(country, isOpaque = false) {
     return null;
   }
   return html`<span
+    title=${!suppressTitle ? country : null}
     className="flag-icon flag-icon-squared flag-icon-${countryCode} ${isOpaque
       ? "flag-icon-opaque"
       : "flag-icon-transparent"}"
   ></span>`;
 }
 
-function renderSector(sector) {
+function renderSector(sector, suppressTitle = false) {
   let sectorCode = "";
   switch (sector) {
     case "AGR":
@@ -789,6 +810,7 @@ function renderSector(sector) {
   }
   return html`<span
     className="flag-icon sector-icon icon-${sectorCode}"
+    title=${!suppressTitle ? sector : null}
   ></span>`;
 }
 
