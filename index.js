@@ -16,10 +16,10 @@ app.use(sessionHandler);
 
 // Game data
 const { createNewGame, reduce } = require("./data/game-state-reducer");
-function createBot() {
+function createBot(name) {
   return {
     id: `bot-${createUserId()}`,
-    player: "Computer",
+    player: name,
   };
 }
 
@@ -254,10 +254,10 @@ app.post("/game/quickstart", (req, res) => {
     bid: 4,
     player: "Human",
   });
-  newGame = reduce(newGame, { type: "JOIN", player: createBot() });
-  newGame = reduce(newGame, { type: "JOIN", player: createBot() });
-  newGame = reduce(newGame, { type: "JOIN", player: createBot() });
-  newGame = reduce(newGame, { type: "JOIN", player: createBot() });
+  newGame = reduce(newGame, { type: "JOIN", player: createBot("Computer 1") });
+  newGame = reduce(newGame, { type: "JOIN", player: createBot("Computer 2") });
+  newGame = reduce(newGame, { type: "JOIN", player: createBot("Computer 3") });
+  newGame = reduce(newGame, { type: "JOIN", player: createBot("Computer 4") });
   newGame = reduce(newGame, { type: "START", shuffle: true, tutorial: true });
 
   activeGames.set(gameId, newGame);
