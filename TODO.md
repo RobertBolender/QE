@@ -45,6 +45,12 @@
 - [ ] filter auction history by country, by sector, by winner
 - [ ] allow players to leave the table when the game is over
 - [ ] delete the game when the last player leaves
+- [ ] no-downtime deploys
+- [ ] display won auctions on scoreboard
+- [ ] add changelog
+- [ ] add rules
+- [ ] add scoring details
+- [ ] add actual tutorial
 
 ## Wishlist
 
