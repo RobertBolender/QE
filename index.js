@@ -70,7 +70,10 @@ function getGameState(userId, gameId) {
           ) {
             visibleData[player.id] = 0;
           } else if (auction.winner === player.id) {
-            visibleData[player.id] = `> ${auction[userId]}`;
+            visibleData[player.id] = `> ${Math.max(
+              auction[userId],
+              auction[auction.startingPlayer]
+            )}`;
           } else {
             visibleData[player.id] = auction[player.id] ? "?" : null;
           }
