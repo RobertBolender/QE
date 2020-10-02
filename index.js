@@ -92,6 +92,8 @@ function getGameState(userId, gameId) {
     : gameState.players.map((player, index) => {
         if (player.id === userId) {
           player.sector = privateData.playersWithSectors[index].sector;
+        } else {
+          delete player.sector;
         }
         return player;
       });

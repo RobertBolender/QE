@@ -37,7 +37,7 @@ function reduce(state, action) {
     case "START":
       const shuffledPlayers = action.shuffle
         ? shuffle(state.players)
-        : state.players;
+        : [...state.players];
 
       // TODO: decide if I care about the performance of parse/stringify for a deep clone
       const companies = JSON.parse(
