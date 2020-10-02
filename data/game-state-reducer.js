@@ -110,10 +110,15 @@ function reduce(state, action) {
       const newAuctions = [...state.privateData.auctions];
       const newUpcomingAuctions = [...state.privateData.upcomingAuctions];
 
+      let nextTurn = state.turn;
+      let newStatus = state.status;
+      let nextRound = state.round;
+
       // Record this bid
       newAuctions[newAuctions.length - 1][action.userId] = action.bid;
       if (startingPlayer && action.userId === startingPlayer.id) {
         newAuctions[newAuctions.length - 1].startingPlayer = startingPlayer.id;
+        newStatus = `Starting bid: ${action.bid}`;
       }
 
       const isLastBidOfRound = priorBidsThisRound === state.players.length - 1;
@@ -136,10 +141,6 @@ function reduce(state, action) {
         },
         [0, []]
       );
-
-      let nextTurn = state.turn;
-      let newStatus = state.status;
-      let nextRound = state.round;
 
       if (
         isLastBidOfRound &&
@@ -204,7 +205,7 @@ function reduce(state, action) {
       }
 
       if (isLastBidOfRound && isThreePlayerGame && isPenultimateAuction) {
-        newStatus = `Final round`;
+        newStatus = `Final round!`;
         nextTurn = "final";
         nextRound = "final";
       }
@@ -215,10 +216,6 @@ function reduce(state, action) {
         if (nextTurn === 0) {
           nextRound++;
         }
-      }
-
-      if (priorBidsThisRound === 0) {
-        newStatus = `Starting bid: ${action.bid}`;
       }
 
       newAuctions[newAuctions.length - 1].round = nextRound;
