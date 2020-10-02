@@ -322,6 +322,12 @@ button:active {
   grid-auto-rows: min-content;
 }
 
+.auction-history thead {
+  padding-bottom: 2px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid black;
+}
+
 .auction-history tr {
   display: grid;
   grid-auto-flow: column;
