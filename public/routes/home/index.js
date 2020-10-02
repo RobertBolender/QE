@@ -193,7 +193,7 @@ function NewGame({ setGameState }) {
       action="/games"
       onSubmit=${handleSubmit}
     >
-      <button className="quickstart" onClick=${handleQuickstart}>
+      <button type="button" className="quickstart" onClick=${handleQuickstart}>
         Play a Tutorial Game
       </button>
       <label for="name">Game name</label>
