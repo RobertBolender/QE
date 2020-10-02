@@ -28,19 +28,20 @@ const getAppCookies = (req) => {
   return parsedCookies;
 };
 
-const getUserId = (req, res) => getAppCookies(req, res)["qeUserId"];
+const getUserIdFromCookies = (req, res) => getAppCookies(req, res)["qeUserId"];
+
+const getUserId = (req) => req.session.userId;
 
 const sessions = {};
 
 const sessionHandler = (req, res, next) => {
-  let userId = getUserId(req, res);
+  let userId = getUserIdFromCookies(req, res);
 
   if (!userId || !sessions[userId]) {
     userId = createUserId();
     sessions[userId] = {
-      cart: {},
+      userId,
     };
-    res.clearCookie("userId");
   }
 
   sendUserIdCookie(userId, res);

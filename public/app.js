@@ -4,7 +4,7 @@ const html = htm.bind(React.createElement);
 
 const Route = {
   "/": React.lazy(() => import("./routes/home/index.js")),
-  "*": React.lazy(() => import("./routes/lost/index.js")),
+  "*": React.lazy(() => import("./routes/home/index.js")),
 };
 
 ReactDOM.render(

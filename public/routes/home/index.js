@@ -12,11 +12,7 @@ const html = htm.bind(React.createElement);
 
 export default function App() {
   const [gameState, setGameState] = useState();
-
-  useEffect(async () => {
-    const data = await getJson("/game/current");
-    setGameState(data);
-  }, []);
+  useCurrentGameState(setGameState, gameState?.hash);
 
   if (!gameState) {
     return "Loading...";
@@ -238,17 +234,28 @@ function NewGame({ setGameState }) {
 function useCurrentGameState(setGameState, initialGameStateHash) {
   const lastSeenHash = useRef(initialGameStateHash);
   useEffect(() => {
-    const timer = setInterval(async () => {
-      const data = await getJson(`/game/current`);
+    async function getState() {
+      const urlToFetch = window.location.pathname.startsWith("/game")
+        ? window.location.pathname
+        : "/game/current";
+      const data = await getJson(urlToFetch);
       if (data.errorMessage) {
         console.error(data.errorMessage);
         return;
+      }
+      if (data.id && window.location.pathname !== `/game/${data.id}`) {
+        window.history.pushState({ id: data.id }, "", `/game/${data.id}`);
+      }
+      if (!data.id && window.location.pathname.startsWith("/game")) {
+        window.history.pushState({}, "", "/");
       }
       if (lastSeenHash.current !== data.hash) {
         lastSeenHash.current = data.hash;
         setGameState(data);
       }
-    }, 2000);
+    }
+    getState();
+    const timer = setInterval(getState, 2000);
     return () => {
       clearInterval(timer);
     };
@@ -302,7 +309,6 @@ function AlertBar() {
 
 function Game({ gameState = {}, setGameState }) {
   const {
-    hash,
     currentUser,
     id,
     name,
@@ -320,8 +326,6 @@ function Game({ gameState = {}, setGameState }) {
   const { handleAddMessage, handleClearMessages } = useContext(AlertContext);
 
   const currentPlayer = getCurrentPlayer(gameState);
-
-  useCurrentGameState(setGameState, hash);
 
   const handleQuit = useCallback(async () => {
     if (!id) {
@@ -444,8 +448,8 @@ function Game({ gameState = {}, setGameState }) {
         className="player-info"
         title="This is your country and private sector advantage"
       >
-        ${renderFlag(currentPlayer.country, true, true)}
-        ${renderSector(currentPlayer.sector, true)}
+        ${renderFlag(currentPlayer?.country, true, true)}
+        ${renderSector(currentPlayer?.sector, true)}
       </span>
       <span className="status-message"
         >${!gameOver ? status : `${playerScores.winner.player} wins!`}</span
@@ -458,8 +462,6 @@ function Game({ gameState = {}, setGameState }) {
       <button onClick=${handleStart}>Start Game</button>
     </div>`}
     ${round !== 0 &&
-    !hasBid &&
-    !waitingForStartBid &&
     html`<form onSubmit=${handleBid} ref=${formRef}>
       ${currentAuction.country &&
       html`<div className="auction-row">
@@ -470,15 +472,20 @@ function Game({ gameState = {}, setGameState }) {
         </div>
         <div className="auction-details">
           ${renderBids(gameState)}
-          <input
-            type="number"
-            min=${isStartingBid ? "1" : "0"}
-            step="1"
-            required
-            onChange=${handleSetBid}
-            ref=${bidRef}
-          />
-          <button type="submit">Bid</button>
+          ${currentPlayer &&
+          !hasBid &&
+          !waitingForStartBid &&
+          html`
+            <input
+              type="number"
+              min=${isStartingBid ? "1" : "0"}
+              step="1"
+              required
+              onChange=${handleSetBid}
+              ref=${bidRef}
+            />
+            <button type="submit">Bid</button>
+          `}
           ${previousAuction &&
           previousWinner &&
           html`
@@ -488,6 +495,7 @@ function Game({ gameState = {}, setGameState }) {
                 ${renderFlag(previousWinner.country, true)}
                 ${previousAuction[previousAuction.winner]}
                 ${players.length === 5 &&
+                currentPlayer &&
                 typeof peeks[currentUser] === "undefined" &&
                 previousAuction[previousAuction.winner] &&
                 previousAuction[previousAuction.winner]
@@ -541,6 +549,7 @@ function Game({ gameState = {}, setGameState }) {
       <p>Start time: ${startTime}</p>
     </details>
     ${round !== 0 &&
+    currentPlayer &&
     html`<div className="button-set">
       <button onClick=${handleFlip}>Flip the table</button>
     </div>`}
@@ -572,7 +581,10 @@ function getPlayerForCountry({ players }, country) {
 }
 
 function getPlayersInOrder({ players }, getIndex) {
-  const index = players.findIndex(getIndex);
+  let index = players.findIndex(getIndex);
+  if (index === -1) {
+    index = 0;
+  }
   return [...players, ...players].slice(index, index + players.length);
 }
 
@@ -585,10 +597,11 @@ function getPlayersWithCurrentUserFirst(gameState) {
 }
 
 function Scoreboard({ gameState }) {
-  const currentPlayer = getCurrentPlayer(gameState);
+  const playersStartingWithCurrent = getPlayersWithCurrentUserFirst(gameState);
+  const currentPlayer =
+    getCurrentPlayer(gameState) ?? playersStartingWithCurrent[0];
   const [viewCountry, setViewCountry] = useState(currentPlayer.country);
   const playerForCountry = getPlayerForCountry(gameState, viewCountry);
-  const playersStartingWithCurrent = getPlayersWithCurrentUserFirst(gameState);
 
   const { playerScores, gameOver } = gameState;
 
@@ -698,10 +711,13 @@ function Scoreboard({ gameState }) {
 
 function AuctionHistory({ gameState }) {
   const { auctions, players, currentUser, playerScores, gameOver } = gameState;
+  const currentPlayer = getCurrentPlayer(gameState);
   const reversedAuctionHistory = [...auctions]
     .map((element, index) => ({ ...element, index }))
     .reverse()
-    .filter((auction) => typeof auction[currentUser] !== "undefined");
+    .filter(
+      (auction) => !currentPlayer || typeof auction[currentUser] !== "undefined"
+    );
 
   const [sort, setSort] = useState("time");
   const handleToggleSort = useCallback(() => {

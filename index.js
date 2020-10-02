@@ -1,3 +1,5 @@
+const path = require("path");
+
 // Server setup
 const express = require("express");
 const app = express();
@@ -41,7 +43,8 @@ function getGameState(userId, gameId) {
 
   game = activeGames.get(gameId);
   if (!game) {
-    return {};
+    const currentUser = { currentUser: userId };
+    return { ...currentUser, hash: hash(currentUser) };
   }
 
   const { privateData, ...gameState } = game;
@@ -71,7 +74,7 @@ function getGameState(userId, gameId) {
             visibleData[player.id] = 0;
           } else if (auction.winner === player.id) {
             visibleData[player.id] = `> ${Math.max(
-              auction[userId],
+              typeof auction[userId] !== "undefined" ? auction[userId] : 0,
               auction[auction.startingPlayer]
             )}`;
           } else {
@@ -113,10 +116,6 @@ function getGameState(userId, gameId) {
  */
 app.get("/game/current", (req, res) => {
   const userId = getUserId(req);
-  if (!userId) {
-    return res.json({});
-  }
-
   const gameId = activePlayers.get(userId);
   return res.json(getGameState(userId, gameId));
 });
@@ -131,11 +130,11 @@ app.get("/game/:id", (req, res) => {
   const userId = getUserId(req);
   const gameState = getGameState(userId, gameId);
 
-  if (!gameState.id) {
-    return res.status(400).send("Game not found.");
+  if (!req.accepts("html")) {
+    return res.json(gameState);
   }
 
-  return res.json(gameState);
+  res.sendFile("index.html", { root: path.join(__dirname, "public") });
 });
 
 /**
