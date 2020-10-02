@@ -478,7 +478,7 @@ function Game({ gameState = {}, setGameState }) {
           html`
             <input
               type="number"
-              min=${isStartingBid ? "1" : "0"}
+              min="0"
               step="1"
               required
               onChange=${handleSetBid}
