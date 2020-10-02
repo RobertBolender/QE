@@ -42,9 +42,10 @@
 ## 2.0
 
 - [x] show number of active players
-- [ ] show known spending totals somewhere
-- [ ] highlight tied bids
-- [ ] filter auction history by country, by sector, by winner
+- [x] show known spending totals somewhere
+- [x] highlight tied bids
+- [x] filter auction history by country, by sector, by winner
+- [x] allow spectators to leave
 - [ ] allow players to leave the table when the game is over
 - [ ] delete the game when the last player leaves
 - [ ] no-downtime deploys
