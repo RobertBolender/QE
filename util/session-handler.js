@@ -41,9 +41,9 @@ const sessionHandler = (req, res, next) => {
       cart: {},
     };
     res.clearCookie("userId");
-    sendUserIdCookie(userId, res);
   }
 
+  sendUserIdCookie(userId, res);
   req.session = sessions[userId];
   next();
 };
