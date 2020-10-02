@@ -91,6 +91,16 @@ function reduce(state, action) {
         state.privateData.auctions[state.privateData.auctions.length - 1][
           startingPlayer.id
         ];
+      if (
+        startingPlayer &&
+        !startingBid &&
+        action.userId !== startingPlayer.id
+      ) {
+        return {
+          errorMessage: "You need to wait for the starting bid.",
+        };
+      }
+
       if (action.bid === startingBid) {
         return {
           errorMessage: "You can't bid equal to starting bid.",
