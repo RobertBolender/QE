@@ -121,7 +121,7 @@ function getScoresForPlayer(gameState, player) {
 
   const auctionsByRound = auctions.reduce(
     (result, auction) => {
-      if (typeof auction.round !== "undefined") {
+      if (auction.round > 0 && auction.round < 5) {
         result[auction.round].push(auction);
       }
       return result;
