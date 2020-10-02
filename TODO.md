@@ -46,10 +46,11 @@
 - [x] highlight tied bids
 - [x] filter auction history by country, by sector, by winner
 - [x] allow spectators to leave
+- [ ] display won auctions on scoreboard
 - [ ] allow players to leave the table when the game is over
 - [ ] delete the game when the last player leaves
+- [ ] allow games to expire if no one is playing
 - [ ] no-downtime deploys
-- [ ] display won auctions on scoreboard
 - [ ] add changelog
 - [ ] add rules
 - [ ] add scoring details
