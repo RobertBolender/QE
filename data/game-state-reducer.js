@@ -296,10 +296,13 @@ function reduce(state, action) {
       let botState = { ...state };
       if (priorBids === 0 && startingPlayerIsBot) {
         // Set a starting bid for a bot
+        const randomStartBid = botState.tutorial
+          ? Math.ceil(Math.random() * 10)
+          : 1;
         botState = reduce(botState, {
           type: "BID",
           userId: startingPlayerIsBot.id,
-          bid: 1,
+          bid: randomStartBid,
         });
       }
 
