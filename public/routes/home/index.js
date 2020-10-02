@@ -374,15 +374,17 @@ function Game({ gameState = {}, setGameState }) {
     previousAuction &&
     previousAuction.winner &&
     players.find((player) => player.id === previousAuction.winner);
+
   const hasBid =
     currentUser &&
     currentAuction &&
     typeof currentAuction[currentUser] !== "undefined";
-  const startingPlayer = players[turn].id;
-  const isStartingBid = startingPlayer === currentUser && !hasBid;
-  const startingBid = currentAuction && currentAuction[startingPlayer];
+  const startingPlayerId = Number.isInteger(turn) ? players[turn].id : false;
+  const isStartingBid = startingPlayerId === currentUser && !hasBid;
+  const startingBid =
+    currentAuction && typeof currentAuction[startingPlayerId] !== "undefined";
   const waitingForStartBid =
-    currentAuction && !isStartingBid && typeof startingBid === "undefined";
+    currentAuction && !isStartingBid && startingPlayerId && !startingBid;
 
   const [bid, setBid] = useState();
   const formRef = useRef();
