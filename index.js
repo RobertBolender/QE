@@ -78,7 +78,7 @@ function getGameState(userId, gameId) {
               auction[auction.startingPlayer]
             )}`;
           } else {
-            visibleData[player.id] = auction[player.id] ? "?" : null;
+            visibleData[player.id] = auction[player.id] ? "?" : undefined;
           }
         });
         if (gameState.peeks[userId] === index) {
