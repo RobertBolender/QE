@@ -559,15 +559,22 @@ function Game({ gameState = {}, setGameState }) {
 function renderBids(gameState) {
   const { auctions } = gameState;
   const currentAuction = auctions[auctions.length - 1];
-  const players = getPlayersInTurnOrder(gameState);
+  const [auctioneer, ...otherPlayers] = getPlayersInTurnOrder(gameState);
   return html`
-    <div className="bids-row">
-      ${players.map((player) =>
-        renderFlag(
-          player.country,
-          typeof currentAuction[player.id] !== "undefined"
-        )
-      )}
+    <div className="bids-section">
+      <div className="auctioneer-row">
+        ${renderFlag(auctioneer.country, true)}
+        ${currentAuction[auctioneer.id] &&
+        `Starting bid: ${currentAuction[auctioneer.id]}`}
+      </div>
+      <div className="bids-row">
+        ${otherPlayers.map((player) =>
+          renderFlag(
+            player.country,
+            typeof currentAuction[player.id] !== "undefined"
+          )
+        )}
+      </div>
     </div>
   `;
 }
