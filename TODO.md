@@ -49,7 +49,7 @@
 - [x] show auction number, number of auctions remaining
 - [x] make the auctioneer obvious
 - [ ] make it obvious when your action is required
-- [ ] display won auctions on scoreboard
+- [x] display won auctions on scoreboard
 - [ ] allow players to leave the table when the game is over
 - [ ] delete the game when the last player leaves
 - [ ] allow games to expire if no one is playing
