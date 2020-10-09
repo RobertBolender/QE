@@ -88,6 +88,12 @@ button:active {
   grid-gap: 8px;
 }
 
+.radio-set.small > input + label {
+  padding: 6px;
+  grid-auto-flow: column;
+  white-space: nowrap;
+}
+
 .radio-set > input:disabled + label {
   pointer-events: none;
   font-weight: normal;
@@ -116,6 +122,11 @@ button:active {
   top: calc(100% - 2px);
   background: var(--radio-set-color, green);
   height: 8px;
+}
+
+.radio-set.small > input:checked + label:after {
+  top: calc(100% - 1px);
+  height: 6px;
 }
 
 .game-lobby,
@@ -368,6 +379,10 @@ button:active {
   grid-gap: 4px;
 }
 
+.auction-history thead > tr:first-child {
+  margin-bottom: 4px;
+}
+
 .auction-history tr > th:nth-child(1) {
   cursor: pointer;
 }
@@ -380,9 +395,25 @@ button:active {
   color: #bbb;
 }
 
+.auction-history thead > tr:first-child > :first-child {
+  color: black;
+  width: auto;
+  grid-column: 1 / span 2;
+}
+
+.auction-history tr:first-child > th {
+  display: grid;
+  align-items: center;
+  justify-items: stretch;
+}
+
 .auction-history tr > :nth-child(2) {
   text-align: left;
   white-space: nowrap;
+}
+
+.auction-history thead > tr > :nth-child(2) {
+  text-align: right;
 }
 
 .auction-history th,
@@ -424,6 +455,7 @@ button:active {
   grid-gap: 12px;
 }
 
+.auction-history .radio-set,
 .scoreboard .radio-set {
   --radio-set-color: #48bb78;
   --focus-color: #48bb78;

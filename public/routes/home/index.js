@@ -839,10 +839,34 @@ function AuctionHistory({ gameState }) {
       <table>
         <thead>
           <tr>
-            <th onClick=${handleToggleSort} title=${sortTitle}>
-              ↕${sortSymbol}
+            <th>
+              <div className="radio-set small">
+                <input
+                  id="sort-time"
+                  type="radio"
+                  name="mode"
+                  checked=${sort === "time"}
+                  onChange=${() => setSort("time")}
+                />
+                <label for="sort-time">↕🕑</label>
+                <input
+                  id="sort-country"
+                  type="radio"
+                  name="mode"
+                  checked=${sort === "country"}
+                  onChange=${() => setSort("country")}
+                />
+                <label for="sort-country">↕🎌</label>
+                <input
+                  id="sort-money"
+                  type="radio"
+                  name="mode"
+                  checked=${sort === "money"}
+                  onChange=${() => setSort("money")}
+                />
+                <label for="sort-money">↕💰</label>
+              </div>
             </th>
-            <th>Auction History</th>
             ${players.map((player) => html`<th>${player.country}</th>`)}
           </tr>
           <tr>
