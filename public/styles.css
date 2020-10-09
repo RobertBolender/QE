@@ -152,7 +152,7 @@ button:active {
   top: 0;
   left: 0;
   right: 0;
-  height: 39px;
+  height: 47px;
   background: white;
 }
 
@@ -181,12 +181,25 @@ button:active {
 
 .player-info {
   display: flex;
+  padding: 2px;
+  border-radius: 25px;
+  border: 2px solid #aaa;
+  background: #eee;
 }
 .player-info > span {
   width: 25px !important;
   height: 25px;
   border-radius: 50%;
   border: 1px solid black;
+}
+
+.purchases {
+  display: grid;
+  grid-auto-flow: row;
+  grid-gap: 4px;
+  padding: 2px;
+  border: 2px solid #aaa;
+  background: #eee;
 }
 
 .auction-row {
@@ -515,6 +528,13 @@ button:active {
 .flags {
   display: flex;
   justify-content: space-between;
+}
+
+.flag-icon {
+  width: 30px !important;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid black;
 }
 
 .flag-icon-opaque {

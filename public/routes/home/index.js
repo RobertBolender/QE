@@ -585,6 +585,39 @@ function renderBids(gameState) {
   `;
 }
 
+function renderPurchases(gameState, player) {
+  const { auctions } = gameState;
+  const auctionsForCurrentPlayer = auctions.filter(
+    (auction) => auction.winner === player.id
+  );
+  const naturalization = auctionsForCurrentPlayer
+    .filter((auction) => auction.country === player.country)
+    .map((_) => renderFlag(player.country, true));
+
+  const sectors = auctionsForCurrentPlayer
+    .map((auction) => auction.sector)
+    .sort()
+    .map((sector) => renderSector(sector));
+
+  if (!naturalization.length && !sectors.length) {
+    return null;
+  }
+
+  return html`
+    <div className="purchases">
+      <div>Auctions won: ${auctionsForCurrentPlayer.length}</div>
+      ${naturalization.length
+        ? html`<div className="naturalization-purchases">
+            ${naturalization}
+          </div>`
+        : null}
+      ${sectors.length
+        ? html`<div className="sectors-purchases">${sectors}</div>`
+        : null}
+    </div>
+  `;
+}
+
 function getCurrentPlayer({ players, currentUser }) {
   return players.find((player) => player.id === currentUser);
 }
@@ -660,14 +693,11 @@ function Scoreboard({ gameState }) {
         )}
       </div>
       <div className="score-details">
+        ${renderPurchases(gameState, playerForCountry)}
         <table>
           <tr>
             <td>${gameOver ? "Total" : "Known"} Spending</td>
             <td>$${totalSpend}</td>
-          </tr>
-          <tr>
-            <td>Auctions Won</td>
-            <td>${totalAuctionCount}</td>
           </tr>
           ${playerForCountry.sector &&
           html`<tr>
