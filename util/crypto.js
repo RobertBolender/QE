@@ -6,7 +6,12 @@ function uuidv4() {
   });
 }
 
+function thisIsGettingOutOfHand() {
+  return [uuidv4(), uuidv4()];
+}
+
 module.exports = {
   createGameId: uuidv4,
   createUserId: uuidv4,
+  createUserCredentials: thisIsGettingOutOfHand,
 };

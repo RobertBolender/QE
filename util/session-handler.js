@@ -1,8 +1,8 @@
-const { createUserId } = require("./crypto");
+const { createUserCredentials } = require("./crypto");
 
-const sendUserIdCookie = (userId, res) => {
+const sendUserSecretCookie = (userSecret, res) => {
   const oneDayToMilliseconds = 24 * 60 * 60 * 1000;
-  res.cookie("qeUserId", userId, {
+  res.cookie("qeUserSecret", userSecret, {
     // HTTP Set-Cookie uses seconds, Express res.cookie uses milliseconds
     maxAge: oneDayToMilliseconds,
     // If true, deny access to cookie in the client's javascript
@@ -28,24 +28,26 @@ const getAppCookies = (req) => {
   return parsedCookies;
 };
 
-const getUserIdFromCookies = (req, res) => getAppCookies(req, res)["qeUserId"];
+const getUserSecretFromCookies = (req, res) =>
+  getAppCookies(req, res)["qeUserSecret"];
 
 const getUserId = (req) => req.session.userId;
 
 const sessions = {};
 
 const sessionHandler = (req, res, next) => {
-  let userId = getUserIdFromCookies(req, res);
+  let userSecret = getUserSecretFromCookies(req, res);
+  let userId = null;
 
-  if (!userId || !sessions[userId]) {
-    userId = createUserId();
-    sessions[userId] = {
+  if (!userSecret || !sessions[userSecret]) {
+    [userSecret, userId] = createUserCredentials();
+    sessions[userSecret] = {
       userId,
     };
   }
 
-  sendUserIdCookie(userId, res);
-  req.session = sessions[userId];
+  sendUserSecretCookie(userSecret, res);
+  req.session = sessions[userSecret];
   next();
 };
 
