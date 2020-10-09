@@ -314,6 +314,8 @@ function Game({ gameState = {}, setGameState }) {
     name,
     startTime,
     auctions,
+    auction,
+    totalAuctions,
     players,
     status,
     peeks,
@@ -462,13 +464,17 @@ function Game({ gameState = {}, setGameState }) {
       <button onClick=${handleStart}>Start Game</button>
     </div>`}
     ${round !== 0 &&
+    !gameOver &&
     html`<form onSubmit=${handleBid} ref=${formRef}>
       ${currentAuction.country &&
       html`<div className="auction-row">
-        <div className="auction-item" onClick=${handleFocus}>
-          ${renderFlag(currentAuction.country)}
-          ${renderSector(currentAuction.sector)}
-          ${renderValue(currentAuction.value)}
+        <div className="auction-item-wrapper">
+          <div className="auction-item" onClick=${handleFocus}>
+            ${renderFlag(currentAuction.country)}
+            ${renderSector(currentAuction.sector)}
+            ${renderValue(currentAuction.value)}
+          </div>
+          <div className="auction-number">#${auction} / ${totalAuctions}</div>
         </div>
         <div className="auction-details">
           ${renderBids(gameState)}

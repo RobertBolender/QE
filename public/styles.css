@@ -314,6 +314,17 @@ button:active {
   font-weight: bold;
 }
 
+.auction-item-wrapper {
+  display: grid;
+  grid-auto-flow: row;
+  grid-gap: 8px;
+}
+
+.auction-number {
+  text-align: center;
+  color: #333;
+}
+
 .auction-history {
   border: 1px solid #333;
   border-radius: 0 0 6px 6px;

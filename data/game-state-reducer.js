@@ -63,9 +63,11 @@ function reduce(state, action) {
         ...state,
         players: shuffledPlayers,
         peeks: {},
-        status: `Starting bid: ${shuffledPlayers[0].player}`,
+        status: `First auctioneer: ${shuffledPlayers[0].player}`,
         round: 1,
         turn: 0,
+        auction: 1,
+        totalAuctions: shuffledCompanies.length,
         startTime: new Date().toISOString(),
         tutorial: action.tutorial,
         privateData: {
@@ -110,6 +112,7 @@ function reduce(state, action) {
       const newAuctions = [...state.privateData.auctions];
       const newUpcomingAuctions = [...state.privateData.upcomingAuctions];
 
+      let nextAuction = state.auction;
       let nextTurn = state.turn;
       let newStatus = state.status;
       let nextRound = state.round;
@@ -118,7 +121,7 @@ function reduce(state, action) {
       newAuctions[newAuctions.length - 1][action.userId] = action.bid;
       if (startingPlayer && action.userId === startingPlayer.id) {
         newAuctions[newAuctions.length - 1].startingPlayer = startingPlayer.id;
-        newStatus = `Starting bid: ${action.bid}`;
+        newStatus = ``;
       }
 
       const isLastBidOfRound = priorBidsThisRound === state.players.length - 1;
@@ -205,14 +208,16 @@ function reduce(state, action) {
       }
 
       if (isLastBidOfRound && isThreePlayerGame && isPenultimateAuction) {
+        nextAuction++;
         newStatus = `Final round!`;
         nextTurn = "final";
         nextRound = "final";
       }
 
       if (isLastBidOfRound && !(isThreePlayerGame && isPenultimateAuction)) {
+        nextAuction++;
         nextTurn = (state.turn + 1) % state.players.length;
-        newStatus = `Starting bid: ${state.players[nextTurn].player}`;
+        newStatus = ``;
         if (nextTurn === 0) {
           nextRound++;
         }
@@ -228,6 +233,7 @@ function reduce(state, action) {
           auctions: newAuctions,
           upcomingAuctions: newUpcomingAuctions,
         },
+        auction: nextAuction,
         turn: nextTurn,
         round: nextRound,
       };
