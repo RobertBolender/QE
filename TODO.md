@@ -46,8 +46,8 @@
 - [x] highlight tied bids
 - [x] filter auction history by country, by sector, by winner
 - [x] allow spectators to leave
-- [ ] show auction number, number of auctions remaining
-- [ ] make the auctioneer obvious
+- [x] show auction number, number of auctions remaining
+- [x] make the auctioneer obvious
 - [ ] make it obvious when your action is required
 - [ ] display won auctions on scoreboard
 - [ ] allow players to leave the table when the game is over
