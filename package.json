@@ -14,7 +14,7 @@
     "deploy:app": "scp -rq ./public/routes/ robert@robertbolender.com:/var/www/qe.robertbolender.com/public/"
   },
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "naughty-words": "^1.2.0",
     "object-hash": "^2.0.3"
   },
